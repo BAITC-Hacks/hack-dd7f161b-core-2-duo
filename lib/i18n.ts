@@ -339,6 +339,102 @@ const kk: Dict = {
   back: "Артқа",
   aiLive: "AI таңдауы сервермен тексерілді",
   aiFallback: "Ұсыныс ережелер бойынша есептелді; AI қазір қолжетімсіз",
+  scenarioBase: "Бастапқы жинақ",
+  scenarioCheck: "Тексеру сценарийі",
+  navTeam: "Қадамы жоқтар",
+  navSkills: "Дағдылар мен шектеулер",
+  navParticipation: "Қатысу",
+  navData: "Деректер",
+  src_profile: "Мақсат профильден алынды",
+  src_user: "Мақсатты өзіңіз таңдадыңыз",
+  src_provisional_next_grade: "Мақсат таңдалмаған — келесі грейд есептелді",
+  src_current_role_maintenance: "Мақсат таңдалмаған — ағымдағы рөлге сәйкестік",
+  readinessHint: "Мақсат талаптарының өлшенген қамтылуы: сыни дағдылар ×2. Бұл жоғарылау ықтималдығы да, жұмыс бағасы да емес.",
+  critical: "Сыни",
+  criticalMet: "Сыни талаптар орындалды",
+  criticalOpen: "Сыни талаптар әлі орындалмаған",
+  changeGoal: "Мақсатты өзгерту",
+  resetGoal: "Мақсатты қалпына келтіру",
+  save: "Сақтау",
+  aiChecking: "AI таңдауды тексеруде…",
+  ai_fallback_disabled: "OpenAI кілті бапталмаған",
+  ai_fallback_timeout: "AI 9 секунд ішінде жауап бермеді",
+  ai_fallback_unavailable: "AI қызметі қолжетімсіз",
+  ai_fallback_invalid_output: "AI жауабы тексеруден өтпеді",
+  unsnooze: "Қайтару",
+  hours: "сағ",
+  tier0: "Сыни алшақтықты жабады",
+  tier1: "Мақсат алшақтығын жабады",
+  tier2: "Дайындық қадамы",
+  noStep: "Қазір орындалатын қадам жоқ",
+  routeHint: "Бұл реттілік бағасы, брондау емес. Өз қарқынымен — күніне 4 сағ, сессиялар — ceil(сағ/8) күн.",
+  routeNone: "Төрт қадам мен 120 күн ішінде жол табылмады",
+  plan_target_reached_in_plan: "Жол мақсаттың барлық талаптарын жабады",
+  plan_partial_progress: "Жол ішінара прогресс береді",
+  plan_no_path_found: "Жол табылмады",
+  plan_search_limited: "Іздеу шектеу бойынша тоқтатылды",
+  plan_not_run: "Мақсат талаптары орындалып қойған",
+  targetSkills: "Мақсат дағдылары",
+  fromHistory: "тарих бойынша",
+  proxyDate: "шамамен алынған күн",
+  achievements: "Жеке жетістіктер",
+  gameLevel: "Ойын деңгейі",
+  scoreBreakdown: "Кандидат бағасының талдауы",
+  simTitle: "Болжам, деректер өзгермейді",
+  readinessDelta: "Дайындық",
+  unlocks: "Ашылады",
+  catalog: "Белсенділіктер каталогы",
+  eligible: "Қолжетімді",
+  blocked: "Қолжетімсіз",
+  status_completed: "аяқталды",
+  status_in_progress: "орындалуда",
+  status_dropped: "тасталды",
+  status_no_show: "келмеді",
+  status_declined: "бас тартты",
+  status_overdue: "мерзімі өтті",
+  mandatory: "міндетті",
+  voluntary: "ерікті",
+  appRecord: "қосымшада белгіленді",
+  settingsHistory: "Қадам таңдағанда менің тарихымды ескеру",
+  settingsGaming: "Жеке жетістіктерді қосу (XP және бейджтер)",
+  settingsGamingHint: "Ерікті. Дағдыларға, дайындыққа және ұсыныстарға әсер етпейді. Оны тек сіз көресіз.",
+  settingsReset: "Осы браузердегі белгілерімді тазарту",
+  health: "Даму тарихының жағдайы",
+  hr_employees: "Қызметкерлер",
+  hr_open_critical: "Сыни алшақтығы бар",
+  hr_no_step: "Орындалатын қадамы жоқ",
+  hr_target_met: "Мақсат талаптары орындалған",
+  hrSkillsTitle: "Қандай дағдылар төмен және оларды дамытуға не кедергі",
+  hrNoStepTitle: "Кімде ұсынылған қадам жоқ және неліктен",
+  hrPartTitle: "Белсенділіктер бойынша қатысу",
+  belowTarget: "талаптан төмен",
+  criticalGapCount: "сыни",
+  providers: "каталогтағы белсенділіктер",
+  actionable: "қадамы бар",
+  bridgeCnt: "дайындық арқылы",
+  uncovered: "қадамы жоқ",
+  intervention: "Каталогта нені өзгертуге болады",
+  completionShare: "Аяқталу үлесі",
+  attendance: "Келу (шамамен)",
+  feedback: "Пікір",
+  observations: "бақылау",
+  uniqueEmployees: "қызметкер",
+  uploadTitle: "Тексеру сценарийі",
+  uploadLead: "Деректер жинағы форматындағы employees.json және activity_history.csv файлдарын жүктеңіз. Оқшауланған сценарий жасалады: каталог пен талаптар бастапқы жинақтан, қызметкерлер мен тарих тек файлдардан алынады.",
+  chooseFiles: "Файлдарды таңдау",
+  validate: "Тексеру",
+  commit: "Сценарий жасау",
+  switchBase: "Бастапқы жинаққа оралу",
+  switchCheck: "Тексеру сценарийін ашу",
+  errors: "Қателер",
+  warnings: "Ескертулер",
+  openEmployee: "Профильді ашу",
+  proof_catalog_fact: "каталог фактісі",
+  proof_eligibility_fact: "қатысу шарты",
+  proof_search_limit: "іздеу шегі",
+  proof_user_choice: "қызметкер таңдауы",
+  forbidden: "Бұл профильге қолжетімділік жоқ",
+  population: "Іріктеме",
 };
 
 const dicts: Record<Locale, Dict> = { ru, en, kk };
@@ -349,6 +445,12 @@ export function translator(locale: Locale) {
 }
 
 export type T = ReturnType<typeof translator>;
+
+type Tri = { ru: string; en: string; kk?: string };
+
+export function pick(t: Tri, locale: Locale): string {
+  return locale === "en" ? t.en : locale === "kk" ? (t.kk ?? t.ru) : t.ru;
+}
 
 type Fact = { id: string; category: string; code: string; values: Record<string, any> };
 
@@ -362,6 +464,10 @@ const GROUP: Record<Locale, Record<string, string>> = {
 export function renderFact(f: Fact, locale: Locale, skill: (id: string) => string, event: (id: string) => string, t: T): string {
   const v = f.values;
   const L = locale === "en";
+  if (locale === "kk") {
+    const kkText = renderFactKk(f, skill, event, t);
+    if (kkText) return kkText;
+  }
   switch (f.code) {
     case "PROFILE_CONTEXT":
       return L
@@ -416,50 +522,86 @@ export function renderFact(f: Fact, locale: Locale, skill: (id: string) => strin
   }
 }
 
-export const REASON_TEXT: Record<string, { ru: string; en: string }> = {
-  TARGET_REQUIREMENTS_MET: { ru: "Все требования цели выполнены — выберите следующую цель", en: "All goal requirements are met — pick the next goal" },
-  NO_RELEVANT_CATALOG_EVENT: { ru: "В каталоге нет активности, развивающей навык", en: "No catalog activity develops this skill" },
-  SKILL_CAP_CEILING: { ru: "Текущие активности не дают прироста на этом уровне", en: "Current activities give no growth at this level" },
-  AUDIENCE_MISMATCH: { ru: "Полезные активности закрыты для текущей роли/грейда", en: "Useful activities are not open to the current role/grade" },
-  PREREQUISITES_UNMET: { ru: "Сначала нужен подготовительный уровень", en: "A preparatory level is needed first" },
-  NO_UPCOMING_SESSION: { ru: "Нет будущих сессий", en: "No upcoming sessions" },
-  ONLY_ALREADY_COMPLETED_EVENTS: { ru: "Все подходящие активности уже пройдены", en: "All suitable activities are already completed" },
-  ALL_RELEVANT_ACTIONS_SNOOZED: { ru: "Сотрудник отложил подходящие шаги", en: "The employee snoozed the suitable steps" },
-  ACTIVE_ACTIVITY_ALREADY_SELECTED: { ru: "Уже идёт подходящая активность", en: "A suitable activity is already in progress" },
-  NO_PATH_WITHIN_HORIZON: { ru: "Маршрут не найден в пределах поиска", en: "No route within search limits" },
-  NO_SKILL_PROVIDER: { ru: "В каталоге нет активности для навыка", en: "No catalog activity for the skill" },
-  CAP_INSUFFICIENT: { ru: "Потолок активностей ниже требования", en: "Activity caps are below the requirement" },
-  AUDIENCE_RESTRICTED: { ru: "Нужно согласовать доступ или расширить аудиторию", en: "Access or wider audience is needed" },
-  SCHEDULE_UNAVAILABLE: { ru: "Нужна новая сессия", en: "A new session is needed" },
-  PREREQUISITE_BLOCKED: { ru: "Нужен подготовительный модуль", en: "A preparatory module is needed" },
-  CATALOG_EXHAUSTED: { ru: "Нужна следующая ступень обучения", en: "The next learning level is needed" },
-  USER_DEFERRED: { ru: "Отложено сотрудником", en: "Deferred by employee" },
-  MANDATORY: { ru: "Обязательное — назначает HR, не рекомендуется", en: "Mandatory — assigned by HR, not recommended" },
-  ALREADY_COMPLETED: { ru: "Уже пройдено", en: "Already completed" },
-  SNOOZED: { ru: "Отложено до следующего раза", en: "Snoozed" },
+export const REASON_TEXT: Record<string, Tri> = {
+  TARGET_REQUIREMENTS_MET: { ru: "Все требования цели выполнены — выберите следующую цель", en: "All goal requirements are met — pick the next goal", kk: "Мақсаттың барлық талаптары орындалды — келесі мақсатты таңдаңыз" },
+  NO_RELEVANT_CATALOG_EVENT: { ru: "В каталоге нет активности, развивающей навык", en: "No catalog activity develops this skill", kk: "Каталогта бұл дағдыны дамытатын белсенділік жоқ" },
+  SKILL_CAP_CEILING: { ru: "Текущие активности не дают прироста на этом уровне", en: "Current activities give no growth at this level", kk: "Қазіргі белсенділіктер бұл деңгейде өсім бермейді" },
+  AUDIENCE_MISMATCH: { ru: "Полезные активности закрыты для текущей роли/грейда", en: "Useful activities are not open to the current role/grade", kk: "Пайдалы белсенділіктер ағымдағы рөл/грейд үшін жабық" },
+  PREREQUISITES_UNMET: { ru: "Сначала нужен подготовительный уровень", en: "A preparatory level is needed first", kk: "Алдымен дайындық деңгейі қажет" },
+  NO_UPCOMING_SESSION: { ru: "Нет будущих сессий", en: "No upcoming sessions", kk: "Алдағы сессиялар жоқ" },
+  ONLY_ALREADY_COMPLETED_EVENTS: { ru: "Все подходящие активности уже пройдены", en: "All suitable activities are already completed", kk: "Барлық сәйкес белсенділіктер өтіліп қойған" },
+  ALL_RELEVANT_ACTIONS_SNOOZED: { ru: "Сотрудник отложил подходящие шаги", en: "The employee snoozed the suitable steps", kk: "Қызметкер сәйкес қадамдарды кейінге қалдырды" },
+  ACTIVE_ACTIVITY_ALREADY_SELECTED: { ru: "Уже идёт подходящая активность", en: "A suitable activity is already in progress", kk: "Сәйкес белсенділік қазір орындалуда" },
+  NO_PATH_WITHIN_HORIZON: { ru: "Маршрут не найден в пределах поиска", en: "No route within search limits", kk: "Іздеу шегінде жол табылмады" },
+  NO_SKILL_PROVIDER: { ru: "В каталоге нет активности для навыка", en: "No catalog activity for the skill", kk: "Каталогта бұл дағдыға белсенділік жоқ" },
+  CAP_INSUFFICIENT: { ru: "Потолок активностей ниже требования", en: "Activity caps are below the requirement", kk: "Белсенділіктердің шегі талаптан төмен" },
+  AUDIENCE_RESTRICTED: { ru: "Нужно согласовать доступ или расширить аудиторию", en: "Access or wider audience is needed", kk: "Қолжетімділікті келісу немесе аудиторияны кеңейту қажет" },
+  SCHEDULE_UNAVAILABLE: { ru: "Нужна новая сессия", en: "A new session is needed", kk: "Жаңа сессия қажет" },
+  PREREQUISITE_BLOCKED: { ru: "Нужен подготовительный модуль", en: "A preparatory module is needed", kk: "Дайындық модулі қажет" },
+  CATALOG_EXHAUSTED: { ru: "Нужна следующая ступень обучения", en: "The next learning level is needed", kk: "Оқытудың келесі сатысы қажет" },
+  USER_DEFERRED: { ru: "Отложено сотрудником", en: "Deferred by employee", kk: "Қызметкер кейінге қалдырды" },
+  MANDATORY: { ru: "Обязательное — назначает HR, не рекомендуется", en: "Mandatory — assigned by HR, not recommended", kk: "Міндетті — HR тағайындайды, ұсынылмайды" },
+  ALREADY_COMPLETED: { ru: "Уже пройдено", en: "Already completed", kk: "Өтіліп қойған" },
+  SNOOZED: { ru: "Отложено до следующего раза", en: "Snoozed", kk: "Кейінге қалдырылған" },
 };
 
 export function reasonText(code: string, locale: Locale) {
   const r = REASON_TEXT[code];
-  if (!r) return code;
-  return locale === "en" ? r.en : r.ru;
+  return r ? pick(r, locale) : code;
 }
 
-export const INTERVENTION_TEXT: Record<string, { ru: string; en: string }> = {
-  create_learning_activity: { ru: "Создать учебную активность для навыка", en: "Create a learning activity for the skill" },
-  add_advanced_level: { ru: "Добавить продвинутый уровень с более высоким потолком", en: "Add an advanced level with a higher cap" },
-  agree_access_or_widen_audience: { ru: "Согласовать доступ или расширить аудиторию", en: "Agree access or widen the audience" },
-  schedule_session: { ru: "Запланировать новую сессию", en: "Schedule a new session" },
-  add_preparatory_module: { ru: "Добавить подготовительный модуль", en: "Add a preparatory module" },
-  add_next_level_activity: { ru: "Добавить следующую ступень обучения", en: "Add the next learning level" },
-  none_user_choice: { ru: "Действий не нужно — выбор сотрудника", en: "No action — employee's choice" },
+export const INTERVENTION_TEXT: Record<string, Tri> = {
+  create_learning_activity: { ru: "Создать учебную активность для навыка", en: "Create a learning activity for the skill", kk: "Дағдыға арналған оқу белсенділігін жасау" },
+  add_advanced_level: { ru: "Добавить продвинутый уровень с более высоким потолком", en: "Add an advanced level with a higher cap", kk: "Шегі жоғары жетілдірілген деңгей қосу" },
+  agree_access_or_widen_audience: { ru: "Согласовать доступ или расширить аудиторию", en: "Agree access or widen the audience", kk: "Қолжетімділікті келісу немесе аудиторияны кеңейту" },
+  schedule_session: { ru: "Запланировать новую сессию", en: "Schedule a new session", kk: "Жаңа сессия жоспарлау" },
+  add_preparatory_module: { ru: "Добавить подготовительный модуль", en: "Add a preparatory module", kk: "Дайындық модулін қосу" },
+  add_next_level_activity: { ru: "Добавить следующую ступень обучения", en: "Add the next learning level", kk: "Оқытудың келесі сатысын қосу" },
+  none_user_choice: { ru: "Действий не нужно — выбор сотрудника", en: "No action — employee's choice", kk: "Әрекет қажет емес — қызметкер таңдауы" },
 };
 
-export const HEALTH_TEXT: Record<string, { ru: string; en: string }> = {
-  INSUFFICIENT_HISTORY: { ru: "Недостаточно данных для вывода о привычном формате", en: "Not enough data to infer a preferred format" },
-  IN_PROGRESS: { ru: "Есть добровольная активность в процессе", en: "A voluntary activity is in progress" },
-  RECENT_ACTIVITY: { ru: "Есть завершённая добровольная активность за последние 90 дней", en: "A voluntary activity was completed in the last 90 days" },
-  FORMAT_REVIEW_SUGGESTED: { ru: "Несколько пропусков за 180 дней — стоит пересмотреть формат или нагрузку, а не мотивацию", en: "Several misses in 180 days — review format or load, not motivation" },
-  NO_RECENT_COMPLETION_OBSERVED: { ru: "В загруженной истории не найдено завершений за 180 дней", en: "No completions found in the loaded history for 180 days" },
-  OBSERVED_HISTORY_AVAILABLE: { ru: "История участия доступна", en: "Participation history available" },
+export const HEALTH_TEXT: Record<string, Tri> = {
+  INSUFFICIENT_HISTORY: { ru: "Недостаточно данных для вывода о привычном формате", en: "Not enough data to infer a preferred format", kk: "Әдеттегі формат туралы қорытынды жасауға деректер жеткіліксіз" },
+  IN_PROGRESS: { ru: "Есть добровольная активность в процессе", en: "A voluntary activity is in progress", kk: "Орындалып жатқан ерікті белсенділік бар" },
+  RECENT_ACTIVITY: { ru: "Есть завершённая добровольная активность за последние 90 дней", en: "A voluntary activity was completed in the last 90 days", kk: "Соңғы 90 күнде аяқталған ерікті белсенділік бар" },
+  FORMAT_REVIEW_SUGGESTED: { ru: "Несколько пропусков за 180 дней — стоит пересмотреть формат или нагрузку, а не мотивацию", en: "Several misses in 180 days — review format or load, not motivation", kk: "180 күнде бірнеше рет өткізіп алу — мотивацияны емес, формат пен жүктемені қайта қарау керек" },
+  NO_RECENT_COMPLETION_OBSERVED: { ru: "В загруженной истории не найдено завершений за 180 дней", en: "No completions found in the loaded history for 180 days", kk: "Жүктелген тарихта 180 күнде аяқталған белсенділік табылмады" },
+  OBSERVED_HISTORY_AVAILABLE: { ru: "История участия доступна", en: "Participation history available", kk: "Қатысу тарихы қолжетімді" },
 };
+
+function renderFactKk(f: Fact, skill: (id: string) => string, event: (id: string) => string, t: T): string | null {
+  const v = f.values;
+  switch (f.code) {
+    case "PROFILE_CONTEXT":
+      return `Сіз ${v.role}, грейд ${v.grade}, еңбек өтілі ${v.tenure_months} ай.`;
+    case "TARGET_CONTEXT":
+      return `${t("target")}: ${v.target_role} ${v.target_grade} — ${t("src_" + v.source).toLowerCase()}.`;
+    case "REQUIREMENT":
+      return `Мақсат ${skill(v.skill_id)} кемінде ${v.required} болуын талап етеді${v.critical ? " — сыни дағды" : ""}.`;
+    case "SKILL_GAP":
+      return `${skill(v.skill_id)}: қазір ${v.current}, қажет ${v.required}, алшақтық ${v.gap}.`;
+    case "EVENT_EFFECT":
+      return `${skill(v.skill_id)} ${v.before}→${v.after} береді (gain ${v.gain}, шегі ${v.cap})${v.gap_after != null ? `, кейінгі алшақтық: ${v.gap_after}` : ""}.`;
+    case "HISTORY_INSUFFICIENT":
+      return `Ұқсас белсенділіктер бойынша деректер әлі жеткіліксіз (${v.observations} ерікті жазба) — тарих таңдауға әсер етпеді.`;
+    case "HISTORY_GROUP": {
+      const g = GROUP.kk[v.group] ?? v.group;
+      const neg = v.no_show + v.dropped + v.declined;
+      return `Тарих (${g}): аяқталды ${v.completed}, өткізілді/тасталды/бас тартылды ${neg}, барлығы ${v.n}; сәйкестік ${v.affinity}.`;
+    }
+    case "ELIGIBLE": {
+      if (v.action_kind === "continue") return "Бастап қойғансыз — қайта жазылмай жалғастыруға болады.";
+      const pre = Object.entries(v.prerequisites || {})
+        .map(([s, l]) => `${skill(s)} ≥ ${l}`)
+        .join(", ");
+      const when = v.session ? `${t("session")}: ${v.session}` : t("selfPaced");
+      return `Рөліңіз бен грейдіңізге қолжетімді${pre ? `, шарттар орындалған (${pre})` : ""}. ${when}.`;
+    }
+    case "UNLOCKS":
+      return `Келесі қадамдарды ашады: ${v.event_ids.map(event).join(", ")}.`;
+    case "CRITICAL_REMAINING":
+      return "Қадамнан кейін қалады: " + v.skills.map((s: any) => `${skill(s.skill_id)} ${s.after}/${s.required}`).join(", ");
+    default:
+      return null;
+  }
+}

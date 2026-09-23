@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ApiError, post } from "@/lib/api";
 import { Meta, useApi } from "@/lib/hooks";
-import { HEALTH_TEXT, reasonText, renderFact, translator } from "@/lib/i18n";
+import { HEALTH_TEXT, pick, reasonText, renderFact, translator } from "@/lib/i18n";
 import { AppState, currentOverlay, updateOverlay, useAppState } from "@/lib/store";
 
 type Fact = { id: string; category: string; code: string; values: Record<string, any> };
@@ -41,7 +41,7 @@ export function EmployeeView({ employeeId, meta, section }: { employeeId: string
     const now = snap.readiness.readiness_pct;
     if (prevReadiness.current != null && Math.abs(now - prevReadiness.current) > 0.001) {
       const d = now - prevReadiness.current;
-      setToast(`${t("readinessDelta")}: ${pct(prevReadiness.current)}% → ${pct(now)}% (${d > 0 ? "+" : ""}${d.toFixed(1)} п.п.)`);
+      setToast(`${t("readinessDelta")}: ${pct(prevReadiness.current)}% → ${pct(now)}% (${d > 0 ? "+" : ""}${d.toFixed(1)} ${pick({ ru: "п.п.", en: "pp", kk: "п.т." }, s.locale)})`);
       setTimeout(() => setToast(null), 4000);
     }
     prevReadiness.current = now;
@@ -287,6 +287,16 @@ const CAT: Record<string, string> = {
   prerequisite_path: "Маршрут",
   limitation: "Ограничение",
 };
+const CAT_KK: Record<string, string> = {
+  profile: "Профиль",
+  target_requirement: "Мақсат талабы",
+  skill_gap: "Алшақтық",
+  event_effect: "Әсері",
+  history: "Тарих",
+  eligibility: "Қатысу шарты",
+  prerequisite_path: "Жол",
+  limitation: "Шектеу",
+};
 const CAT_EN: Record<string, string> = {
   profile: "Profile",
   target_requirement: "Goal requirement",
@@ -307,7 +317,7 @@ function RecCard({ ctx, cand, choice, main }: { ctx: Ctx; cand: Cand; choice?: A
   const summaryFacts = choice
     ? cand.facts.filter((f) => chosen.has(f.id))
     : cand.facts.filter((f) => ["SKILL_GAP", "EVENT_EFFECT", "HISTORY_INSUFFICIENT", "HISTORY_GROUP", "TARGET_CONTEXT"].includes(f.code)).slice(0, 5);
-  const catName = s.locale === "en" ? CAT_EN : CAT;
+  const catName = s.locale === "en" ? CAT_EN : s.locale === "kk" ? CAT_KK : CAT;
   return (
     <article className={`rec ${main ? "main" : "alt"}`}>
       <div className="row" style={{ justifyContent: "space-between" }}>
@@ -390,13 +400,20 @@ function WhyNot({ ctx, cand }: { ctx: Ctx; cand: Cand }) {
     <div className="evidence small">
       {lowest && lowest.skill_id && (
         <p>
-          {s.locale === "en" ? "Lowest goal skill" : "Самый низкий навык цели"}: <b>{skill(lowest.skill_id)}</b> ({lowest.current}/{lowest.required}
-          {lowest.critical ? ", critical" : ""}). {s.locale === "en" ? "Ranking weighs critical gaps ×2 and history, not just the minimum." : "Ранжирование учитывает критичность (×2), закрытие разрыва и историю — не только минимальный навык."}
+          {pick({ ru: "Самый низкий навык цели", en: "Lowest goal skill", kk: "Мақсаттың ең төмен дағдысы" }, s.locale)}: <b>{skill(lowest.skill_id)}</b> ({lowest.current}/{lowest.required}
+          {lowest.critical ? ", critical" : ""}). {pick(
+            {
+              ru: "Ранжирование учитывает критичность (×2), закрытие разрыва и историю — не только минимальный навык.",
+              en: "Ranking weighs critical gaps ×2 and history, not just the minimum.",
+              kk: "Рейтинг тек ең төмен дағдыны емес, сыни маңыздылықты (×2), алшақтықтың жабылуын және тарихты ескереді.",
+            },
+            s.locale,
+          )}
         </p>
       )}
       {(snap.alternatives_considered as any[]).map((a) => (
         <p key={a.event_id}>
-          <b>{a.title}</b> — {t("tier" + a.tier)}, {a.score} vs {cand.score}; {s.locale === "en" ? "history fit" : "история"} {a.breakdown.history_fit}
+          <b>{a.title}</b> — {t("tier" + a.tier)}, {a.score} vs {cand.score}; {pick({ ru: "история", en: "history fit", kk: "тарих" }, s.locale)} {a.breakdown.history_fit}
         </p>
       ))}
       {blocked.slice(0, 4).map((c) => (
@@ -521,7 +538,7 @@ function Simulation({ ctx, steps, onClose }: { ctx: Ctx; steps: string[]; onClos
                   <div className="step-title">{st.title}</div>
                   <div className="changes">
                     {st.changes.filter((c: any) => c.actual > 0).map((c: any) => `${skill(c.skill_id)} ${c.before}→${c.after}`).join(", ") || "—"} · {t("readinessDelta")} +
-                    {st.readiness_delta_pp.toFixed(1)} п.п.
+                    {st.readiness_delta_pp.toFixed(1)} {pick({ ru: "п.п.", en: "pp", kk: "п.т." }, s.locale)}
                     {st.new_unlocks.length > 0 && ` · ${t("unlocks")}: ${st.new_unlocks.map(event).join(", ")}`}
                   </div>
                 </li>
@@ -612,7 +629,12 @@ function SkillRow({ r, name, t }: { r: any; name: string; t: Ctx["t"] }) {
 function Achievements(ctx: Ctx) {
   const { snap, t } = ctx;
   const g = snap.gamification;
-  const names: Record<string, string> = { FIRST_STEP: "Первый шаг", FIVE_STEPS: "Пять шагов", CRITICAL_GAP_CLOSED: "Критический разрыв закрыт" };
+  const names: Record<string, string> =
+    ctx.s.locale === "kk"
+      ? { FIRST_STEP: "Алғашқы қадам", FIVE_STEPS: "Бес қадам", CRITICAL_GAP_CLOSED: "Сыни алшақтық жабылды" }
+      : ctx.s.locale === "en"
+        ? { FIRST_STEP: "First step", FIVE_STEPS: "Five steps", CRITICAL_GAP_CLOSED: "Critical gap closed" }
+        : { FIRST_STEP: "Первый шаг", FIVE_STEPS: "Пять шагов", CRITICAL_GAP_CLOSED: "Критический разрыв закрыт" };
   return (
     <section className="panel">
       <div className="section-head">
@@ -697,7 +719,7 @@ function History(ctx: Ctx) {
             {h.history_observed_from ? ` · ${h.history_observed_from}…${snap.as_of}` : ""}
           </span>
         </div>
-        <p>{HEALTH_TEXT[h.code]?.[s.locale === "en" ? "en" : "ru"] ?? h.code}</p>
+        <p>{(HEALTH_TEXT[h.code] ? pick(HEALTH_TEXT[h.code], s.locale) : h.code)}</p>
       </section>
       <section className="panel">
         <div className="section-head">
