@@ -1,0 +1,20 @@
+
+Running 11 tests using 2 workers
+
+(node:87423) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:87422) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   2 [chromium] › e2e/employee.spec.ts:3:5 › сотрудник видит профиль, готовность и объяснённые рекомендации (11.6s)
+  ✓   1 [chromium] › e2e/access.spec.ts:3:5 › employee cannot view another employee through an HR profile URL (13.9s)
+  ✓   3 [chromium] › e2e/goal.spec.ts:3:5 › другая цель меняет источник, сброс восстанавливает исходную цель (6.0s)
+  ✓   4 [chromium] › e2e/hr.spec.ts:3:5 › HR sees dashboard cards and expands catalog constraints (4.5s)
+  ✓   5 [chromium] › e2e/hr.spec.ts:47:5 › HR opens the selected employee from the no-step list (15.7s)
+  ✓   6 [chromium] › e2e/locale.spec.ts:3:5 › employee can switch navigation from Russian to Kazakh and English (18.4s)
+  ✓   7 [chromium] › e2e/mobile.spec.ts:20:5 › employee path fits a 360 × 780 viewport (6.8s)
+  ✓   8 [chromium] › e2e/mobile.spec.ts:28:5 › HR dashboard fits a 360 × 780 viewport (7.9s)
+  ✓   9 [chromium] › e2e/persistence.spec.ts:3:5 › reload /me сохраняет вход и готовность после выполнения шага (9.7s)
+  ✓  10 [chromium] › e2e/upload.spec.ts:10:5 › HR creates a three-person scenario and rejects an invalid upload (7.0s)
+  ✓  11 [chromium] › e2e/what-if.spec.ts:3:5 › what-if прогноз совпадает с выполнением; toast и обновлённый AI не вызывают pageerror (8.3s)
+
+  11 passed (59.0s)

@@ -1,0 +1,664 @@
+{
+  "config": {
+    "argv": [
+      "/opt/homebrew/Cellar/node/26.8.1/bin/node",
+      "/Users/assylkhan/Desktop/hackalem/project-tz/codex/runtime/audit-66c3e3c/node_modules/@playwright/test/cli.js",
+      "test",
+      "--config=docs/playwright.production.config.ts"
+    ],
+    "configFile": "/Users/assylkhan/Desktop/hackalem-wt/demo-docs/docs/playwright.production.config.ts",
+    "rootDir": "/Users/assylkhan/Desktop/hackalem-wt/demo-docs/e2e",
+    "failOnFlakyTests": false,
+    "forbidOnly": true,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 2
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Users/assylkhan/Desktop/hackalem-wt/demo-docs/docs/evidence/e2e-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 2
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/Users/assylkhan/Desktop/hackalem-wt/demo-docs/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "./docs/evidence/e2e-results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 2,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "access.spec.ts",
+      "file": "access.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "employee cannot view another employee through an HR profile URL",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 13871,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-23T12:15:16.589Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "9e7a053a61b60e2af93d-fb2a28556cebd6931f11",
+          "file": "access.spec.ts",
+          "line": 3,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "employee.spec.ts",
+      "file": "employee.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "сотрудник видит профиль, готовность и объяснённые рекомендации",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [
+                {
+                  "type": "AI status",
+                  "description": "Выбор AI проверен сервером · gpt-6-luna"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 11554,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-23T12:15:16.591Z",
+                  "annotations": [
+                    {
+                      "type": "AI status",
+                      "description": "Выбор AI проверен сервером · gpt-6-luna"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "3c37713e1e72b903cb86-9ddb27ea12de988318c2",
+          "file": "employee.spec.ts",
+          "line": 3,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "goal.spec.ts",
+      "file": "goal.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "другая цель меняет источник, сброс восстанавливает исходную цель",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [
+                {
+                  "type": "AI status",
+                  "description": "Выбор AI проверен сервером · gpt-6-luna"
+                },
+                {
+                  "type": "AI status",
+                  "description": "Выбор AI проверен сервером · gpt-6-luna"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 6005,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-23T12:15:28.570Z",
+                  "annotations": [
+                    {
+                      "type": "AI status",
+                      "description": "Выбор AI проверен сервером · gpt-6-luna"
+                    },
+                    {
+                      "type": "AI status",
+                      "description": "Выбор AI проверен сервером · gpt-6-luna"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "82abb281d0c99392dbb3-9e1c66b674fa99740617",
+          "file": "goal.spec.ts",
+          "line": 3,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "hr.spec.ts",
+      "file": "hr.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "HR sees dashboard cards and expands catalog constraints",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4492,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-23T12:15:30.886Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "f17589ad66aaf90cef8f-3ba9fa17ded17f1f4e97",
+          "file": "hr.spec.ts",
+          "line": 3,
+          "column": 5
+        },
+        {
+          "title": "HR opens the selected employee from the no-step list",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 15685,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-23T12:15:34.584Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "f17589ad66aaf90cef8f-de1b875132ada284346a",
+          "file": "hr.spec.ts",
+          "line": 47,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "locale.spec.ts",
+      "file": "locale.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "employee can switch navigation from Russian to Kazakh and English",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [
+                {
+                  "type": "AI status",
+                  "description": "Выбор AI проверен сервером · gpt-6-luna"
+                },
+                {
+                  "type": "AI status",
+                  "description": "AI таңдауы сервермен тексерілді · gpt-6-luna"
+                },
+                {
+                  "type": "AI status",
+                  "description": "AI choice verified by the server · gpt-6-luna"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 18390,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-23T12:15:35.390Z",
+                  "annotations": [
+                    {
+                      "type": "AI status",
+                      "description": "Выбор AI проверен сервером · gpt-6-luna"
+                    },
+                    {
+                      "type": "AI status",
+                      "description": "AI таңдауы сервермен тексерілді · gpt-6-luna"
+                    },
+                    {
+                      "type": "AI status",
+                      "description": "AI choice verified by the server · gpt-6-luna"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "521615c42917fec406e0-5d889b7f816cc8bb0f7b",
+          "file": "locale.spec.ts",
+          "line": 3,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "mobile.spec.ts",
+      "file": "mobile.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "employee path fits a 360 × 780 viewport",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [
+                {
+                  "type": "AI status",
+                  "description": "Выбор AI проверен сервером · gpt-6-luna"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 6824,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-23T12:15:50.281Z",
+                  "annotations": [
+                    {
+                      "type": "AI status",
+                      "description": "Выбор AI проверен сервером · gpt-6-luna"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e79c838550b25e92508e-1a77ab13d630c09afe2b",
+          "file": "mobile.spec.ts",
+          "line": 20,
+          "column": 5
+        },
+        {
+          "title": "HR dashboard fits a 360 × 780 viewport",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 7924,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-23T12:15:53.789Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e79c838550b25e92508e-5e71eaaa6d4764daa63d",
+          "file": "mobile.spec.ts",
+          "line": 28,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "persistence.spec.ts",
+      "file": "persistence.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "reload /me сохраняет вход и готовность после выполнения шага",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [
+                {
+                  "type": "AI status",
+                  "description": "Выбор AI проверен сервером · gpt-6-luna"
+                },
+                {
+                  "type": "AI after completion",
+                  "description": "live_validated; model=gpt-6-luna; cached=true"
+                },
+                {
+                  "type": "AI status",
+                  "description": "Выбор AI проверен сервером · gpt-6-luna"
+                },
+                {
+                  "type": "Readiness",
+                  "description": "Kubernetes in Practice: 74.1% → 75.9%"
+                },
+                {
+                  "type": "AI status",
+                  "description": "Выбор AI проверен сервером · gpt-6-luna"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 9705,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-23T12:15:57.114Z",
+                  "annotations": [
+                    {
+                      "type": "AI status",
+                      "description": "Выбор AI проверен сервером · gpt-6-luna"
+                    },
+                    {
+                      "type": "AI after completion",
+                      "description": "live_validated; model=gpt-6-luna; cached=true"
+                    },
+                    {
+                      "type": "AI status",
+                      "description": "Выбор AI проверен сервером · gpt-6-luna"
+                    },
+                    {
+                      "type": "Readiness",
+                      "description": "Kubernetes in Practice: 74.1% → 75.9%"
+                    },
+                    {
+                      "type": "AI status",
+                      "description": "Выбор AI проверен сервером · gpt-6-luna"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "a5ef73a4e2a1baaea746-476751d6e941a0fe58da",
+          "file": "persistence.spec.ts",
+          "line": 3,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "upload.spec.ts",
+      "file": "upload.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "HR creates a three-person scenario and rejects an invalid upload",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6983,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-23T12:16:01.726Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "64f97298e5aac3754605-1c3d6546e4727acfb7ec",
+          "file": "upload.spec.ts",
+          "line": 10,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "what-if.spec.ts",
+      "file": "what-if.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "what-if прогноз совпадает с выполнением; toast и обновлённый AI не вызывают pageerror",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [
+                {
+                  "type": "AI status",
+                  "description": "Выбор AI проверен сервером · gpt-6-luna"
+                },
+                {
+                  "type": "AI after completion",
+                  "description": "live_validated; model=gpt-6-luna; cached=true"
+                },
+                {
+                  "type": "AI status",
+                  "description": "Выбор AI проверен сервером · gpt-6-luna"
+                },
+                {
+                  "type": "Readiness",
+                  "description": "Kubernetes in Practice: 74.1% → 75.9%"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 8254,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-23T12:16:06.828Z",
+                  "annotations": [
+                    {
+                      "type": "AI status",
+                      "description": "Выбор AI проверен сервером · gpt-6-luna"
+                    },
+                    {
+                      "type": "AI after completion",
+                      "description": "live_validated; model=gpt-6-luna; cached=true"
+                    },
+                    {
+                      "type": "AI status",
+                      "description": "Выбор AI проверен сервером · gpt-6-luna"
+                    },
+                    {
+                      "type": "Readiness",
+                      "description": "Kubernetes in Practice: 74.1% → 75.9%"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "11cf766cd55049a759a4-d8c1e8f1ae00f5073de0",
+          "file": "what-if.spec.ts",
+          "line": 3,
+          "column": 5
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-09-23T12:15:16.098Z",
+    "duration": 59028.531,
+    "expected": 11,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

@@ -1,0 +1,162 @@
+{
+  "generated_utc": "2026-09-23T12:23:54.645407+00:00",
+  "command": "PYTHONDONTWRITEBYTECODE=1 python3 docs/measure_summary.py",
+  "input_sha256": {
+    "production_measurements.json": "423d911e692a7cc62e064ff3cc2ee467a84220ccb1437738777c222b5bbd6f2f",
+    "production_demo_measurements.json": "7b22d3dc87a49ca8d50311b05b5fdb414c5458f56920b2f1eec8d20cc41e5bc2",
+    "local_measurements.json": "5a6310d4dfe5794ffd8bd1464f2d402641b2f474daa048d5853b9e3530d43461",
+    "evaluation_branch.json": "198d1e7388aaeb11a7b07aeea4e25e9a1d612dda17a214dcdfaceae313d460f7"
+  },
+  "scope_ru": "Производные значения из сохранённых реальных запусков. repeat_ai исключён. Кэш и not_needed исключены из свежих AI-вызовов. HTTP включает сеть, внутренний elapsed_ms — отдельный показатель.",
+  "started_utc": "2026-09-23T12:11:42.221643+00:00",
+  "finished_utc": "2026-09-23T12:14:35.128401+00:00",
+  "profiles": 9,
+  "snapshot_http_ms": {
+    "min": 534.946,
+    "max": 3636.159
+  },
+  "ai": {
+    "total": 9,
+    "fresh": 6,
+    "fresh_statuses": {
+      "live_validated": 6
+    },
+    "fresh_employee_ids": [
+      "E0001",
+      "E0050",
+      "E0100",
+      "E0150",
+      "E0143",
+      "E0176"
+    ],
+    "cached": 2,
+    "not_needed": 1,
+    "models": [
+      "gpt-6-luna"
+    ],
+    "prompt_versions": [
+      "cq-select-v3"
+    ],
+    "fresh_http_ms": {
+      "min": 3195.49,
+      "max": 7554.186
+    },
+    "fresh_elapsed_ms": {
+      "min": 2352,
+      "max": 5502
+    },
+    "fresh_validations": [
+      [],
+      [],
+      [],
+      [],
+      [],
+      []
+    ]
+  },
+  "production_checks": {
+    "duplicate_skills_equal": {
+      "passed": 8,
+      "total": 8
+    },
+    "duplicate_readiness_equal": {
+      "passed": 8,
+      "total": 8
+    },
+    "what_if_readiness_equal": {
+      "passed": 8,
+      "total": 8
+    },
+    "grade_unchanged": {
+      "passed": 8,
+      "total": 8
+    },
+    "what_if_visible_skills_equal": {
+      "passed": 8,
+      "total": 8
+    }
+  },
+  "auth": {
+    "wrong_actor": [
+      403,
+      403
+    ],
+    "employee_hr_access": [
+      403,
+      403
+    ],
+    "no_headers_profile": [
+      401,
+      401
+    ],
+    "forged_hr_header": [
+      401,
+      401
+    ],
+    "forged_employee_headers": [
+      401,
+      401
+    ],
+    "employee_forged_hr": [
+      403,
+      403
+    ],
+    "wrong_password": [
+      401,
+      401
+    ]
+  },
+  "core": {
+    "employee_denominator": 200,
+    "employees_with_recommendations": 167,
+    "employees_without_recommendations": 33,
+    "target_requirements_met": 0,
+    "cross_role_employees": 28,
+    "main_bridge_employees": 6,
+    "lowest_differs_from_main_employees": 149,
+    "all_lowest_differ_from_main_employees": 114,
+    "no_step_reason_counts": {
+      "NO_RELEVANT_CATALOG_EVENT": 4,
+      "AUDIENCE_MISMATCH": 30,
+      "PREREQUISITES_UNMET": 25,
+      "ONLY_ALREADY_COMPLETED_EVENTS": 32,
+      "SKILL_CAP_CEILING": 5
+    },
+    "recommendation_denominator": 368,
+    "recommendations_allowed": 368,
+    "recommendations_mandatory": 0,
+    "recommendations_with_history_evidence": 368,
+    "minimum_evidence_categories": 6,
+    "recommendations_obeying_growth_rule": 368,
+    "main_completion_denominator": 167,
+    "main_completions_matching_what_if_readiness": 167,
+    "main_completions_matching_what_if_all_skills": 167,
+    "main_completions_keeping_grade": 167
+  },
+  "evaluation_branch": {
+    "generated_at_utc": "2026-09-23T12:07:56.926274+00:00",
+    "measured_git_commit": "2e3cdf8143a303eaef3f6c1a48934e02d170c4e3",
+    "engine_hashes_match_worktree": {
+      "career_quest/__init__.py": true,
+      "career_quest/ai.py": true,
+      "career_quest/auth.py": true,
+      "career_quest/dataset.py": true,
+      "career_quest/engine.py": true,
+      "career_quest/goals.py": true,
+      "career_quest/history.py": true,
+      "career_quest/hr.py": true,
+      "career_quest/progression.py": true
+    },
+    "failed_cases": 0,
+    "additional_failures": 0,
+    "scope_ru": "Сохранённый запуск из origin/feature/evaluation; в этой работе заново не запускался. Исходники ядра сопоставлены по SHA-256."
+  },
+  "e2e": {
+    "startTime": "2026-09-23T12:15:16.098Z",
+    "duration": 59028.531,
+    "expected": 11,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

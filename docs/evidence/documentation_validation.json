@@ -1,0 +1,30 @@
+{
+  "checked_utc": "2026-09-23T12:26:26.636170+00:00",
+  "git_head": "2e3cdf8143a303eaef3f6c1a48934e02d170c4e3",
+  "modified_paths_only_docs": true,
+  "python_scripts_compile": 4,
+  "checked_local_links": 79,
+  "broken_links": [],
+  "secret_matches": [],
+  "demo_numeric_claims_match_saved_responses": true,
+  "production_checks_pass": true,
+  "e2e": {
+    "startTime": "2026-09-23T12:15:16.098Z",
+    "duration": 59028.531,
+    "expected": 11,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "source_sha256": {
+    "docs/measure_demo.py": "94f3e051b71d3a8bcb854ab255541f358ffe80a09b972a4dfbb3564d6b1547b3",
+    "docs/measure_regressions.py": "5aa8534b322e4620d0839816e19285137a7753a4a1c8cf834b43a193099ef9bf",
+    "docs/measure_summary.py": "8acc4acbf5cfcadc2d33149714d6924e313b923a7a97c86e7296ed05efd10e84",
+    "docs/measure_production.py": "0fec7b915825477c55292ca33421c2695e7510582cf641d7a852a8ef3549f970",
+    "docs/SLIDES.md": "e3727fbb14f858049a772d388422bedb23d8c276f6409ad2df2100b0ef5c366e",
+    "docs/DEMO_UPDATE_DONE.md": "66afe6b07be48095b9558361bc1407184d67d96ea53a13e70aa8d0e8a4bd6562",
+    "docs/QA.md": "b35e693219333f9c032ee711643b5da6e2eefaefac34e05689c8531b52cd0852",
+    "docs/DEMO.md": "782f2c3caa0da009ecfd2e5beee33ef4ee5bcb3738de218c3ae583f949e32629",
+    "docs/DECISIONS.md": "30614c5ecce9feb97d51d8deda56feb0f938f11f03f2e5394b39b7fe4fdb9176"
+  }
+}
