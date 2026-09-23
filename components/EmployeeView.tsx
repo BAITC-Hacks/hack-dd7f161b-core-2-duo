@@ -226,13 +226,14 @@ function NextStep(ctx: Ctx) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [snap.fingerprint, s.locale]);
 
-  const live = ai?.ai_status === "live_validated";
+  // an ai answer for an older state (before completion / goal change) must never be rendered
+  const live = ai?.ai_status === "live_validated" && ai.fingerprint === snap.fingerprint;
   const byId = Object.fromEntries(shortlist.map((c) => [c.event_id, c]));
   const baseline = (snap.recommendations as Cand[]).map((c) => ({ cand: c }));
   // ai may return fewer than 3; fill the rest from the rule-based ranking without ai text
   const ordered: { cand: Cand; choice?: Ai["choices"][number] }[] = live
     ? [
-        ...ai!.choices.map((ch) => ({ cand: byId[ch.event_id], choice: ch })),
+        ...ai!.choices.filter((ch) => byId[ch.event_id]).map((ch) => ({ cand: byId[ch.event_id], choice: ch })),
         ...baseline.filter((b) => !ai!.choices.some((ch) => ch.event_id === b.cand.event_id)),
       ].slice(0, 3)
     : baseline;
