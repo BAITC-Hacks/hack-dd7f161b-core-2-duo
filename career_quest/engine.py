@@ -20,20 +20,37 @@ XP_PER_COMPLETION = 20
 
 
 def effective_completions(ds: Dataset, employee_id: str, overlay: dict) -> list[dict]:
-    # first completion wins, including completions already present in source history
+    """Replay admissible app completions in overlay order; never revalidate source history.
+
+    New participation must be voluntary and meet current audience/prerequisites;
+    scheduled events also require an available catalog session.
+    An in-progress participation keeps its original admission, even after its session.
+    Demo semantics allow completion of a future catalog session without advancing as_of.
+    The first effective completion wins per event (per session for recurring events).
+    """
     if employee_id not in ds.employees:
         return []
+    completions = overlay.get("completions") or []
+    if not isinstance(completions, list) or not completions:
+        return []
+    employee = ds.employees[employee_id]
+    records = ds.history_of(employee_id)
+    skills = replay(ds, employee, records)["current"]
+    review = date.fromisoformat(employee["last_review_date"])
+    completed = {r.event_id for r in records if r.status == "completed"}
+    latest = {}
+    for r in sorted(records, key=lambda r: (r.date, r.record_id)):
+        latest[r.event_id] = r
+    active = {eid: r for eid, r in latest.items() if r.status == "in_progress"}
     seen = {
         (
             r.event_id,
             (r.session_date or r.date).isoformat() if r.event_id in REPEATABLE_EVENTS else None,
         )
-        for r in ds.history_of(employee_id)
+        for r in records
         if r.status == "completed"
     }
-    completions = overlay.get("completions") or []
-    if not isinstance(completions, list):
-        return []
+    used_sessions = completed_sessions(records)
     accepted = []
     for c in completions:
         if not isinstance(c, dict) or c.get("employee_id") != employee_id:
@@ -49,12 +66,43 @@ def effective_completions(ds: Dataset, employee_id: str, overlay: dict) -> list[
                 continue
         else:
             session = None
+        ev = ds.events[event_id]
+        if event_id in completed and event_id not in REPEATABLE_EVENTS:
+            continue
+        ongoing = active.get(event_id)
+        if ongoing and event_id in REPEATABLE_EVENTS:
+            ongoing_session = (ongoing.session_date or ongoing.date).isoformat()
+            # A historical registration must not authorize a different club session.
+            if session is None:
+                session = ongoing_session
+            elif session != ongoing_session:
+                ongoing = None
         if event_id in REPEATABLE_EVENTS and session is None:
             continue
         key = (event_id, session if event_id in REPEATABLE_EVENTS else None)
         if key in seen:
             continue
+        if not ongoing:
+            eligibility = check_eligibility(
+                ds, ev, employee, skills, completed, set(active), set(), used_sessions=used_sessions
+            )
+            if not eligibility["eligible"]:
+                continue
+            if ev.scheduled:
+                selected_session = (
+                    date.fromisoformat(session) if session else eligibility["session"]
+                )
+                if selected_session < ds.as_of or selected_session not in ev.upcoming_sessions:
+                    continue
+                session = selected_session.isoformat()
+        if event_id in REPEATABLE_EVENTS:
+            used_sessions.add((event_id, date.fromisoformat(session)))
         seen.add(key)
+        completed.add(event_id)
+        if ongoing:
+            active.pop(event_id, None)
+        if review < ds.as_of:
+            skills, _ = apply_activity(skills, ev)
         accepted.append(
             {
                 "employee_id": employee_id,
@@ -255,13 +303,16 @@ def plan_paths(
                 options.append(
                     (ev, "continue", None, ds.as_of, _finish(ev, ds.as_of, remaining), remaining)
                 )
+        selected_events = {eid for eid, _ in state["used"]}
         for ev in pool:
-            if ev.event_id in state["used"] or ev.event_id in active:
+            if ev.event_id in selected_events and ev.event_id not in REPEATABLE_EVENTS:
+                continue
+            if ev.event_id in active and ev.event_id not in selected_events:
                 continue
             if any(state["skills"].get(s, 0) < lvl for s, lvl in ev.prerequisites.items()):
                 continue
             if ev.scheduled:
-                sess = next_session(ev, state["avail"], horizon_end, used_sessions)
+                sess = next_session(ev, state["avail"], horizon_end, state["used_sessions"])
                 if sess is None:
                     continue
                 options.append((ev, "start", sess, sess, _finish(ev, sess), ev.duration_hours))
@@ -290,10 +341,21 @@ def plan_paths(
                 continue
             new_skills, changes = apply_activity(state["skills"], ev)
             cg, wg = metrics(new_skills)
+            participation_session = sess
+            if kind == "continue" and ev.event_id in REPEATABLE_EVENTS:
+                rec = active[ev.event_id]
+                participation_session = rec.session_date or rec.date
+            step_key = (
+                ev.event_id,
+                participation_session if ev.event_id in REPEATABLE_EVENTS else None,
+            )
             out.append(
                 {
                     "skills": new_skills,
-                    "used": state["used"] | {ev.event_id},
+                    "used": state["used"] | {step_key},
+                    "used_sessions": state["used_sessions"] | {step_key}
+                    if ev.event_id in REPEATABLE_EVENTS
+                    else state["used_sessions"],
                     "avail": finish,
                     "effort": state["effort"] + hours,
                     "cg": cg,
@@ -314,12 +376,19 @@ def plan_paths(
         return out
 
     def key(s: dict):
-        return (s["cg"], s["wg"], s["effort"], s["avail"], tuple(x["event_id"] for x in s["steps"]))
+        return (
+            s["cg"],
+            s["wg"],
+            s["effort"],
+            s["avail"],
+            tuple((x["event_id"], x["session"] or "") for x in s["steps"]),
+        )
 
     cg0, wg0 = metrics(skills)
     root = {
         "skills": skills,
         "used": frozenset(),
+        "used_sessions": frozenset(used_sessions or ()),
         "avail": ds.as_of,
         "effort": 0.0,
         "cg": cg0,

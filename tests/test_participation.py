@@ -17,17 +17,27 @@ def _dataset(history=(), *, event_id="EV_001", mandatory=False, event_format="on
         format=event_format,
         duration_hours=2,
         mandatory=mandatory,
-        target_roles=[],
-        target_grades=[],
+        target_roles=["Backend Engineer"],
+        target_grades=["Middle"],
         develops_skills=[],
         prerequisites={},
-        upcoming_sessions=[date(2026, 9, 1), date(2026, 9, 15)],
+        upcoming_sessions=[date(2026, 10, 10), date(2026, 10, 20)],
     )
     return Dataset(
         as_of=AS_OF,
         skills={},
         role_profiles={},
-        employees={eid: {"employee_id": eid} for eid in ("A", "B", "C", "D")},
+        # app completions are checked for eligibility, so employees need a full profile
+        employees={
+            eid: {
+                "employee_id": eid,
+                "role": "Backend Engineer",
+                "grade": "Middle",
+                "skills": {},
+                "last_review_date": "2026-03-01",
+            }
+            for eid in ("A", "B", "C", "D")
+        },
         events={event_id: event},
         history=list(history),
     )
@@ -108,10 +118,11 @@ def test_duplicate_app_completions_count_once_without_adding_a_second_observatio
 def test_recurring_club_counts_distinct_sessions_once_including_source_history():
     ds = _dataset([_record("A", "completed", event_id="EV_036")], event_id="EV_036")
     completions = [
+        # 2026-08-01 is the session already completed in source history
         _completion(event_id="EV_036", session_date="2026-08-01"),
-        _completion(event_id="EV_036", session_date="2026-09-01"),
-        _completion(event_id="EV_036", session_date="2026-09-01"),
-        _completion(event_id="EV_036", session_date="2026-09-15"),
+        _completion(event_id="EV_036", session_date="2026-10-10"),
+        _completion(event_id="EV_036", session_date="2026-10-10"),
+        _completion(event_id="EV_036", session_date="2026-10-20"),
     ]
 
     row = participation(ds, {"completions": completions})[0]
@@ -147,9 +158,12 @@ def test_invalid_and_unknown_overlay_entries_do_not_affect_participation():
 def test_app_completions_preserve_metric_applicability(
     mandatory, event_format, completion_share, attendance_proxy
 ):
-    ds = _dataset(mandatory=mandatory, event_format=event_format)
+    # a new mandatory completion cannot be self-reported; mandatory metrics come from source history
+    history = [_record("A", "completed")] if mandatory else []
+    ds = _dataset(history, mandatory=mandatory, event_format=event_format)
+    completions = [] if mandatory else [_completion()]
 
-    row = participation(ds, {"completions": [_completion()]})[0]
+    row = participation(ds, {"completions": completions})[0]
 
     assert row["completion_share"] == completion_share
     assert row["attendance_proxy"] == attendance_proxy
