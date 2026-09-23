@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { post } from "@/lib/api";
 import { translator } from "@/lib/i18n";
 import { getState, Locale, setState, useAppState } from "@/lib/store";
@@ -44,6 +44,7 @@ export function Topbar({ asOf, who }: { asOf?: string; who?: string }) {
       <span className="spacer" />
       {who && <span className="meta">{who}</span>}
       <LangSwitch />
+      <ThemeSwitch />
       {s.session && (
         <button
           className="btn small"
@@ -65,6 +66,51 @@ export function LangSwitch() {
       {langs.map((l) => (
         <button key={l} aria-pressed={s.locale === l} onClick={() => setState((x) => ({ ...x, locale: l }))}>
           {l.toUpperCase()}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+type Theme = "system" | "light" | "dark";
+const THEME_KEY = "career-quest:theme";
+const themes: Theme[] = ["system", "light", "dark"];
+const validTheme = (value: string | null | undefined): Theme =>
+  value === "light" || value === "dark" ? value : "system";
+
+export function ThemeSwitch() {
+  const { locale } = useAppState();
+  const t = translator(locale);
+  const [theme, setTheme] = useState<Theme>("system");
+
+  useEffect(() => {
+    // The head script has already restored the theme before the first paint.
+    setTheme(validTheme(document.documentElement.dataset.theme));
+    const sync = (event: StorageEvent) => {
+      if (event.key !== THEME_KEY && event.key !== null) return;
+      const next = validTheme(event.newValue);
+      document.documentElement.dataset.theme = next;
+      setTheme(next);
+    };
+    window.addEventListener("storage", sync);
+    return () => window.removeEventListener("storage", sync);
+  }, []);
+
+  const selectTheme = (next: Theme) => {
+    document.documentElement.dataset.theme = next;
+    setTheme(next);
+    try {
+      window.localStorage.setItem(THEME_KEY, next);
+    } catch {
+      // Keep this tab usable when browser storage is unavailable.
+    }
+  };
+
+  return (
+    <div className="langs theme-switch" role="group" aria-label={t("themeLabel")}>
+      {themes.map((option) => (
+        <button key={option} type="button" aria-pressed={theme === option} onClick={() => selectTheme(option)}>
+          {t(`theme_${option}`)}
         </button>
       ))}
     </div>

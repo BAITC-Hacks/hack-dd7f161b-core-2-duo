@@ -168,6 +168,10 @@ const ru: Dict = {
   snapshotRefreshing: "Обновляем данные. Дождитесь пересчёта рекомендаций.",
   simulationError: "Не удалось рассчитать прогноз.",
   skillSource: "Источник расчёта",
+  themeLabel: "Тема оформления",
+  theme_system: "Системная",
+  theme_light: "Светлая",
+  theme_dark: "Тёмная",
 };
 
 const en: Dict = {
@@ -335,6 +339,10 @@ const en: Dict = {
   snapshotRefreshing: "Refreshing data. Please wait for recommendations to be recalculated.",
   simulationError: "Could not calculate the forecast.",
   skillSource: "Calculation source",
+  themeLabel: "Color theme",
+  theme_system: "System",
+  theme_light: "Light",
+  theme_dark: "Dark",
 };
 
 const kk: Dict = {
@@ -501,6 +509,10 @@ const kk: Dict = {
   snapshotRefreshing: "Деректер жаңартылуда. Ұсыныстардың қайта есептелуін күтіңіз.",
   simulationError: "Болжамды есептеу мүмкін болмады.",
   skillSource: "Есептеу көзі",
+  themeLabel: "Көрініс тақырыбы",
+  theme_system: "Жүйелік",
+  theme_light: "Ашық",
+  theme_dark: "Қараңғы",
 };
 
 const dicts: Record<Locale, Dict> = { ru, en, kk };

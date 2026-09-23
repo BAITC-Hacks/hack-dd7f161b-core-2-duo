@@ -80,7 +80,7 @@ function SkillsSection({ data, meta }: { data: any; meta: Meta }) {
                     <td>
                       <div className="split" title={`${k.actionable_employee_count} / ${k.bridge_employee_count} / ${k.uncovered_employee_count}`}>
                         <span style={{ width: `${(100 * k.actionable_employee_count) / tot}%`, background: "var(--green)" }} />
-                        <span style={{ width: `${(100 * k.bridge_employee_count) / tot}%`, background: "#79bea3" }} />
+                        <span style={{ width: `${(100 * k.bridge_employee_count) / tot}%`, background: "var(--green-bridge)" }} />
                         <span style={{ width: `${(100 * k.uncovered_employee_count) / tot}%`, background: "var(--amber)" }} />
                       </div>
                       <div className="small muted">
