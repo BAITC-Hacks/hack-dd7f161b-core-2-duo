@@ -297,7 +297,7 @@ async def answer_chat(
                 heading = (
                     intro
                     or {
-                        "ru": "Выберите курс кнопкой ниже или напишите его номер — покажу, что изменится:",
+                        "ru": "Выберите курс кнопкой ниже или напишите его номер - покажу, что изменится:",
                         "en": "Here are some options. Choose a button or reply with its number to see the effect:",
                         "kk": "Әсерін көру үшін төмендегі курсты таңдаңыз немесе нөмірін жазыңыз:",
                     }[locale]
