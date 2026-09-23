@@ -1,0 +1,51 @@
+{
+  "employees": [
+    {
+      "employee_id": "E9007",
+      "full_name": "Synthetic Jury 9007",
+      "department": "Quality Assurance",
+      "role": "QA Engineer",
+      "grade": "Middle",
+      "manager_id": null,
+      "hire_date": "2024-10-01",
+      "tenure_months": 24,
+      "work_format": "remote",
+      "preferred_language": "ru",
+      "career_goal": {
+        "target_role": "QA Engineer",
+        "target_grade": "Senior"
+      },
+      "skills": {
+        "SK_TEST_DESIGN": 4,
+        "SK_TEST_AUTOMATION": 3,
+        "SK_API_TESTING": 4,
+        "SK_LOAD_TESTING": 2,
+        "SK_JAVA": 3,
+        "SK_SQL": 3,
+        "SK_CICD": 3,
+        "SK_COMMUNICATION": 3,
+        "SK_TEAMWORK": 3,
+        "SK_CRITICAL_THINKING": 4,
+        "SK_WRITTEN_COMMUNICATION": 3,
+        "SK_MENTORING": 3,
+        "SK_LEADERSHIP": 2,
+        "SK_PUBLIC_SPEAKING": 0
+      },
+      "last_review_date": "2026-09-25"
+    }
+  ],
+  "history": [
+    {
+      "record_id": "JR00015",
+      "employee_id": "E9007",
+      "event_id": "EV_018",
+      "date": "2026-09-27",
+      "due_date": "2026-10-10",
+      "status": "in_progress",
+      "completion_pct": "75",
+      "score": "",
+      "feedback_rating": "",
+      "assigned_by": "self"
+    }
+  ]
+}
