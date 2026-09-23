@@ -1,0 +1,29 @@
+{
+  "meta": {
+    "dataset": "Синтетические сценарии оценки Career Quest",
+    "version": "1.0",
+    "as_of_date": "2026-10-01"
+  },
+  "employees": [
+    {
+      "employee_id": "E_SYNTH",
+      "full_name": "Синтетический сотрудник",
+      "department": "Учебное подразделение",
+      "role": "Инженер учебных примеров",
+      "grade": "Junior",
+      "manager_id": null,
+      "hire_date": "2025-01-01",
+      "tenure_months": 21,
+      "work_format": "office",
+      "preferred_language": "ru",
+      "career_goal": {
+        "target_role": "Инженер учебных примеров",
+        "target_grade": "Middle"
+      },
+      "skills": {
+        "SK_TARGET": 1
+      },
+      "last_review_date": "2026-09-01"
+    }
+  ]
+}

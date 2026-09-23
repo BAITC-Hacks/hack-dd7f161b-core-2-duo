@@ -1,0 +1,133 @@
+{
+  "meta": {
+    "dataset": "Синтетические сценарии оценки Career Quest",
+    "version": "1.0",
+    "as_of_date": "2026-10-01"
+  },
+  "events": [
+    {
+      "event_id": "EV_OFFLINE_NEW",
+      "title": "Очный курс представления результатов",
+      "description": "Очный курс представления результатов. Синтетическая активность для воспроизводимой оценки.",
+      "type": "course",
+      "format": "offline",
+      "duration_hours": 8,
+      "mandatory": false,
+      "target_roles": [
+        "Инженер учебных примеров"
+      ],
+      "target_grades": [
+        "Junior"
+      ],
+      "develops_skills": [
+        {
+          "skill_id": "SK_TARGET",
+          "gain": 1,
+          "max_level": 3
+        }
+      ],
+      "prerequisites": {},
+      "upcoming_sessions": [
+        "2026-10-01"
+      ]
+    },
+    {
+      "event_id": "EV_ONLINE_NEW",
+      "title": "Дистанционный курс представления результатов",
+      "description": "Дистанционный курс представления результатов. Синтетическая активность для воспроизводимой оценки.",
+      "type": "course",
+      "format": "online",
+      "duration_hours": 8,
+      "mandatory": false,
+      "target_roles": [
+        "Инженер учебных примеров"
+      ],
+      "target_grades": [
+        "Junior"
+      ],
+      "develops_skills": [
+        {
+          "skill_id": "SK_TARGET",
+          "gain": 1,
+          "max_level": 3
+        }
+      ],
+      "prerequisites": {},
+      "upcoming_sessions": [
+        "2026-10-01"
+      ]
+    },
+    {
+      "event_id": "EV_OFFLINE_PAST_1",
+      "title": "Первый прошлый очный курс",
+      "description": "Первый прошлый очный курс. Синтетическая активность для воспроизводимой оценки.",
+      "type": "course",
+      "format": "offline",
+      "duration_hours": 8,
+      "mandatory": false,
+      "target_roles": [
+        "Инженер учебных примеров"
+      ],
+      "target_grades": [
+        "Junior"
+      ],
+      "develops_skills": [
+        {
+          "skill_id": "SK_TARGET",
+          "gain": 1,
+          "max_level": 3
+        }
+      ],
+      "prerequisites": {},
+      "upcoming_sessions": []
+    },
+    {
+      "event_id": "EV_OFFLINE_PAST_2",
+      "title": "Второй прошлый очный курс",
+      "description": "Второй прошлый очный курс. Синтетическая активность для воспроизводимой оценки.",
+      "type": "course",
+      "format": "offline",
+      "duration_hours": 8,
+      "mandatory": false,
+      "target_roles": [
+        "Инженер учебных примеров"
+      ],
+      "target_grades": [
+        "Junior"
+      ],
+      "develops_skills": [
+        {
+          "skill_id": "SK_TARGET",
+          "gain": 1,
+          "max_level": 3
+        }
+      ],
+      "prerequisites": {},
+      "upcoming_sessions": []
+    },
+    {
+      "event_id": "EV_OFFLINE_PAST_3",
+      "title": "Третий прошлый очный курс",
+      "description": "Третий прошлый очный курс. Синтетическая активность для воспроизводимой оценки.",
+      "type": "course",
+      "format": "offline",
+      "duration_hours": 8,
+      "mandatory": false,
+      "target_roles": [
+        "Инженер учебных примеров"
+      ],
+      "target_grades": [
+        "Junior"
+      ],
+      "develops_skills": [
+        {
+          "skill_id": "SK_TARGET",
+          "gain": 1,
+          "max_level": 3
+        }
+      ],
+      "prerequisites": {},
+      "upcoming_sessions": []
+    }
+  ]
+}

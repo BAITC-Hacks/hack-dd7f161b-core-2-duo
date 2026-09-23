@@ -1,0 +1,4 @@
+record_id,employee_id,event_id,date,due_date,status,completion_pct,score,feedback_rating,assigned_by
+R001,E_SYNTH,EV_OFFLINE_PAST_1,2026-09-05,,no_show,0,,,self
+R002,E_SYNTH,EV_OFFLINE_PAST_2,2026-09-12,,no_show,0,,,self
+R003,E_SYNTH,EV_OFFLINE_PAST_3,2026-09-19,,no_show,0,,,self
