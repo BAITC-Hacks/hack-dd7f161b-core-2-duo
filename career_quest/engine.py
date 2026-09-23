@@ -251,7 +251,9 @@ def plan_paths(
             for eid, rec in active.items():
                 ev = ds.events[eid]
                 remaining = ev.duration_hours * (1 - rec.completion_pct / 100)
-                options.append((ev, "continue", None, ds.as_of, _finish(ev, ds.as_of, remaining)))
+                options.append(
+                    (ev, "continue", None, ds.as_of, _finish(ev, ds.as_of, remaining), remaining)
+                )
         for ev in pool:
             if ev.event_id in state["used"] or ev.event_id in active:
                 continue
@@ -261,12 +263,22 @@ def plan_paths(
                 sess = next_session(ev, state["avail"], horizon_end, used_sessions)
                 if sess is None:
                     continue
-                options.append((ev, "start", sess, sess, _finish(ev, sess)))
+                options.append((ev, "start", sess, sess, _finish(ev, sess), ev.duration_hours))
             else:
                 if state["avail"] > horizon_end:
                     continue
-                options.append((ev, "start", None, state["avail"], _finish(ev, state["avail"])))
-        for ev, kind, sess, start, finish in options:
+                options.append(
+                    (
+                        ev,
+                        "start",
+                        None,
+                        state["avail"],
+                        _finish(ev, state["avail"]),
+                        ev.duration_hours,
+                    )
+                )
+        # hours are the remaining load: a started course only costs what is left
+        for ev, kind, sess, start, finish, hours in options:
             gains = {
                 e["skill_id"]: actual_gain(
                     state["skills"].get(e["skill_id"], 0), e["gain"], e["max_level"]
@@ -282,7 +294,7 @@ def plan_paths(
                     "skills": new_skills,
                     "used": state["used"] | {ev.event_id},
                     "avail": finish,
-                    "effort": state["effort"] + ev.duration_hours,
+                    "effort": state["effort"] + hours,
                     "cg": cg,
                     "wg": wg,
                     "steps": state["steps"]
@@ -943,7 +955,8 @@ def simulate(ds: Dataset, employee_id: str, overlay: dict, steps: list[str]) -> 
     target = resolve_target(ds, employee, (overlay.get("goals") or {}).get(employee_id))
     required, critical = target_requirements(ds, target)
     completed = {r.event_id for r in records if r.status == "completed"}
-    active = {r.event_id for r in records if r.status == "in_progress"} - completed
+    progress = {r.event_id: r.completion_pct for r in records if r.status == "in_progress"}
+    active = set(progress) - completed
     before = readiness(calculate_gaps(skills, required, critical))
     out_steps = []
     avail = ds.as_of
@@ -981,9 +994,14 @@ def simulate(ds: Dataset, employee_id: str, overlay: dict, steps: list[str]) -> 
         if eid in REPEATABLE_EVENTS and not is_continue:
             used_sessions.add((eid, start))
         rd_after = readiness(calculate_gaps(cur, required, critical))
-        finish = _finish(ev, start)
+        if is_continue:
+            hours = ev.duration_hours * (1 - progress[eid] / 100)
+            finish = _finish(ev, start, hours)
+        else:
+            hours = ev.duration_hours
+            finish = _finish(ev, start)
         avail = finish
-        effort += ev.duration_hours
+        effort += hours
         out_steps.append(
             {
                 "event_id": eid,
