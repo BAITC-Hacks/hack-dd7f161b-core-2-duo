@@ -7,7 +7,7 @@ import { Meta, useApi } from "@/lib/hooks";
 import { INTERVENTION_TEXT, pick, reasonText, translator } from "@/lib/i18n";
 import { setState, useAppState } from "@/lib/store";
 
-const fmtPct = (v: number | null) => (v == null ? "—" : `${(v * 100).toFixed(0)}%`);
+const fmtPct = (v: number | null) => (v == null ? "-" : `${(v * 100).toFixed(0)}%`);
 
 export function HrView({ section, meta }: { section: string; meta: Meta }) {
   const s = useAppState();
@@ -105,7 +105,7 @@ function SkillsSection({ data, meta }: { data: any; meta: Meta }) {
                         )}
                         {k.blockers.map((b: any) => (
                           <p key={b.code} className="small">
-                            {reasonText(b.code, s.locale)} — {b.count} · <span className="chip grey">{t("proof_" + b.proof_level)}</span>{" "}
+                            {reasonText(b.code, s.locale)}: {b.count} · <span className="chip grey">{t("proof_" + b.proof_level)}</span>{" "}
                             {b.event_ids.map((id: string) => meta.events[id]?.title ?? id).join(", ")}
                           </p>
                         ))}
@@ -113,9 +113,9 @@ function SkillsSection({ data, meta }: { data: any; meta: Meta }) {
                         <p className="small muted">
                           {pick(
                             {
-                              ru: "Черновик для проверки HR. В датасете нет вместимости и бюджета — выводов о нехватке мест не делаем.",
+                              ru: "Черновик для проверки HR. В датасете нет вместимости и бюджета, поэтому выводов о нехватке мест не делаем.",
                               en: "Draft for HR review. No capacity or budget data in the dataset, so no seat-shortage conclusions.",
-                              kk: "HR тексеруіне арналған жоба. Деректерде сыйымдылық пен бюджет жоқ — орын тапшылығы туралы қорытынды жасамаймыз.",
+                              kk: "HR тексеруіне арналған жоба. Деректерде сыйымдылық пен бюджет жоқ, сондықтан орын тапшылығы туралы қорытынды жасамаймыз.",
                             },
                             s.locale,
                           )}
@@ -236,7 +236,7 @@ function Participation({ data }: { data: any }) {
                 {!mand && <td className="num-cell">{fmtPct(r.completion_share)}</td>}
                 {!mand && <td className="num-cell">{fmtPct(r.attendance_proxy)}</td>}
                 <td className="num-cell">
-                  {r.avg_feedback == null ? "—" : r.avg_feedback.toFixed(1)} <span className="muted small">n={r.feedback_n}</span>
+                  {r.avg_feedback == null ? "-" : r.avg_feedback.toFixed(1)} <span className="muted small">n={r.feedback_n}</span>
                 </td>
               </tr>
             ))}
@@ -294,7 +294,7 @@ function DataSection() {
               <h3>{t("errors")}</h3>
               {report.errors.map((e: any, i: number) => (
                 <p key={i} className="small">
-                  {e.path} — {e.code} {e.detail}
+                  {e.path}: {e.code} {e.detail}
                 </p>
               ))}
             </div>
@@ -304,7 +304,7 @@ function DataSection() {
               <h3>{t("warnings")}</h3>
               {report.warnings.map((e: any, i: number) => (
                 <p key={i} className="small muted">
-                  {e.path} — {e.code} {e.detail}
+                  {e.path}: {e.code} {e.detail}
                 </p>
               ))}
             </div>

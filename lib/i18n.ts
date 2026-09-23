@@ -9,9 +9,9 @@ const ru: Dict = {
   scenarioBase: "Исходный набор",
   scenarioCheck: "Проверочный сценарий",
   logout: "Выйти",
-  loginTitle: "Куда вы идёте дальше — и почему именно этот шаг",
+  loginTitle: "Куда вы идёте дальше и почему именно этот шаг",
   loginLead:
-    "Навигатор развития: смотрит на ваш грейд, требования следующего уровня, реальные разрывы в навыках и историю участия — и предлагает 1–3 шага с объяснением.",
+    "Навигатор развития: смотрит на ваш грейд, требования следующего уровня, реальные разрывы в навыках и историю участия и предлагает 1–3 шага с объяснением.",
   asEmployee: "Войти как сотрудник",
   asHr: "Войти как HR",
   password: "Пароль",
@@ -37,8 +37,8 @@ const ru: Dict = {
   target: "Цель",
   src_profile: "Цель из профиля",
   src_user: "Цель выбрана вами",
-  src_provisional_next_grade: "Цель не выбрана — рассчитан следующий грейд",
-  src_current_role_maintenance: "Цель не выбрана — соответствие текущей роли",
+  src_provisional_next_grade: "Цель не выбрана: рассчитан следующий грейд",
+  src_current_role_maintenance: "Цель не выбрана: соответствие текущей роли",
   readiness: "Готовность по навыкам",
   readinessHint:
     "Взвешенное покрытие требований цели: критические навыки ×2. Это не вероятность повышения и не оценка работы.",
@@ -73,7 +73,7 @@ const ru: Dict = {
   tier2: "Подготовительный шаг",
   noStep: "Сейчас нет исполнимого шага",
   route: "Маршрут до цели",
-  routeHint: "Оценка последовательности, не бронирование. Self-paced — 4 ч/день, очные — ceil(ч/8) дней.",
+  routeHint: "Оценка последовательности, не бронирование. Self-paced: 4 ч/день, очные: ceil(ч/8) дней.",
   routeNone: "В пределах четырёх шагов и 120 дней маршрут не найден",
   plan_target_reached_in_plan: "Маршрут закрывает все требования цели",
   plan_partial_progress: "Маршрут даёт частичный прогресс",
@@ -136,7 +136,7 @@ const ru: Dict = {
   uniqueEmployees: "сотрудников",
   uploadTitle: "Проверочный сценарий",
   uploadLead:
-    "Загрузите employees.json и activity_history.csv в формате датасета. Будет создан изолированный сценарий: каталог и требования берутся из исходного набора, сотрудники и история — только из файлов.",
+    "Загрузите employees.json и activity_history.csv в формате датасета. Будет создан изолированный сценарий: каталог и требования берутся из исходного набора, сотрудники и история берутся только из файлов.",
   chooseFiles: "Выбрать файлы",
   validate: "Проверить",
   commit: "Создать сценарий",
@@ -205,8 +205,8 @@ const en: Dict = {
   target: "Goal",
   src_profile: "Goal from profile",
   src_user: "Goal chosen by you",
-  src_provisional_next_grade: "No goal set — next grade calculated",
-  src_current_role_maintenance: "No goal set — current role fit",
+  src_provisional_next_grade: "No goal set: next grade calculated",
+  src_current_role_maintenance: "No goal set: current role fit",
   readiness: "Skill readiness",
   readinessHint: "Weighted coverage of goal requirements, critical skills ×2. Not a promotion probability.",
   critical: "Critical",
@@ -398,8 +398,8 @@ const kk: Dict = {
   navData: "Деректер",
   src_profile: "Мақсат профильден алынды",
   src_user: "Мақсатты өзіңіз таңдадыңыз",
-  src_provisional_next_grade: "Мақсат таңдалмаған — келесі грейд есептелді",
-  src_current_role_maintenance: "Мақсат таңдалмаған — ағымдағы рөлге сәйкестік",
+  src_provisional_next_grade: "Мақсат таңдалмаған: келесі грейд есептелді",
+  src_current_role_maintenance: "Мақсат таңдалмаған: ағымдағы рөлге сәйкестік",
   readinessHint: "Мақсат талаптарының өлшенген қамтылуы: сыни дағдылар ×2. Бұл жоғарылау ықтималдығы да, жұмыс бағасы да емес.",
   critical: "Сыни",
   criticalMet: "Сыни талаптар орындалды",
@@ -418,7 +418,7 @@ const kk: Dict = {
   tier1: "Мақсат алшақтығын жабады",
   tier2: "Дайындық қадамы",
   noStep: "Қазір орындалатын қадам жоқ",
-  routeHint: "Бұл реттілік бағасы, брондау емес. Өз қарқынымен — күніне 4 сағ, сессиялар — ceil(сағ/8) күн.",
+  routeHint: "Бұл реттілік бағасы, брондау емес. Өз қарқынымен: күніне 4 сағ, сессиялар: ceil(сағ/8) күн.",
   routeNone: "Төрт қадам мен 120 күн ішінде жол табылмады",
   plan_target_reached_in_plan: "Жол мақсаттың барлық талаптарын жабады",
   plan_partial_progress: "Жол ішінара прогресс береді",
@@ -540,11 +540,11 @@ export function renderFact(f: Fact, locale: Locale, skill: (id: string) => strin
         ? `You are ${v.role}, grade ${v.grade}, ${v.tenure_months} months in the company.`
         : `Вы ${v.role}, грейд ${v.grade}, стаж ${v.tenure_months} мес.`;
     case "TARGET_CONTEXT":
-      return `${t("target")}: ${v.target_role} ${v.target_grade} — ${t("src_" + v.source).toLowerCase()}.`;
+      return `${t("target")}: ${v.target_role} ${v.target_grade} (${t("src_" + v.source).toLowerCase()}).`;
     case "REQUIREMENT":
       return L
         ? `${v.target_grade ?? "Goal"} requires ${skill(v.skill_id)} ≥ ${v.required}${v.critical ? " (critical)" : ""}.`
-        : `Цель требует ${skill(v.skill_id)} не ниже ${v.required}${v.critical ? " — критический навык" : ""}.`;
+        : `Цель требует ${skill(v.skill_id)} не ниже ${v.required}${v.critical ? " (критический навык)" : ""}.`;
     case "SKILL_GAP":
       return L
         ? `${skill(v.skill_id)}: now ${v.current} of ${v.required}, gap ${v.gap}.`
@@ -556,7 +556,7 @@ export function renderFact(f: Fact, locale: Locale, skill: (id: string) => strin
     case "HISTORY_INSUFFICIENT":
       return L
         ? `Not enough similar history yet (${v.total_nonmandatory_terminal_observations ?? v.observations} voluntary records); history did not affect this choice.`
-        : `Данных о похожих активностях пока недостаточно (${v.total_nonmandatory_terminal_observations ?? v.observations} добровольных записей) — история не повлияла на выбор.`;
+        : `Данных о похожих активностях пока недостаточно (${v.total_nonmandatory_terminal_observations ?? v.observations} добровольных записей); история не повлияла на выбор.`;
     case "HISTORY_GROUP": {
       const g = GROUP[locale][v.group] ?? v.group;
       const neg = v.no_show + v.dropped + v.declined;
@@ -569,7 +569,7 @@ export function renderFact(f: Fact, locale: Locale, skill: (id: string) => strin
         .map(([s, l]) => `${skill(s)} ≥ ${l}`)
         .join(", ");
       const when = v.session ? `${t("session")}: ${v.session}` : t("selfPaced");
-      if (v.action_kind === "continue") return L ? `Already started — continue without re-enrolling.` : `Уже начато — можно продолжить без новой записи.`;
+      if (v.action_kind === "continue") return L ? `Already started; continue without re-enrolling.` : `Уже начато, можно продолжить без новой записи.`;
       return L
         ? `Open to your role and grade${pre ? `, prerequisites met (${pre})` : ""}. ${when}.`
         : `Доступно вашей роли и грейду${pre ? `, условия выполнены (${pre})` : ""}. ${when}.`;
@@ -589,7 +589,7 @@ export function renderFact(f: Fact, locale: Locale, skill: (id: string) => strin
 }
 
 export const REASON_TEXT: Record<string, Tri> = {
-  TARGET_REQUIREMENTS_MET: { ru: "Все требования цели выполнены — выберите следующую цель", en: "All goal requirements are met — pick the next goal", kk: "Мақсаттың барлық талаптары орындалды — келесі мақсатты таңдаңыз" },
+  TARGET_REQUIREMENTS_MET: { ru: "Все требования цели выполнены. Выберите следующую цель", en: "All goal requirements are met. Pick the next goal", kk: "Мақсаттың барлық талаптары орындалды. Келесі мақсатты таңдаңыз" },
   NO_RELEVANT_CATALOG_EVENT: { ru: "В каталоге нет активности, развивающей навык", en: "No catalog activity develops this skill", kk: "Каталогта бұл дағдыны дамытатын белсенділік жоқ" },
   SKILL_CAP_CEILING: { ru: "Текущие активности не дают прироста на этом уровне", en: "Current activities give no growth at this level", kk: "Қазіргі белсенділіктер бұл деңгейде өсім бермейді" },
   AUDIENCE_MISMATCH: { ru: "Полезные активности закрыты для текущей роли/грейда", en: "Useful activities are not open to the current role/grade", kk: "Пайдалы белсенділіктер ағымдағы рөл/грейд үшін жабық" },
@@ -606,7 +606,7 @@ export const REASON_TEXT: Record<string, Tri> = {
   PREREQUISITE_BLOCKED: { ru: "Нужен подготовительный модуль", en: "A preparatory module is needed", kk: "Дайындық модулі қажет" },
   CATALOG_EXHAUSTED: { ru: "Нужна следующая ступень обучения", en: "The next learning level is needed", kk: "Оқытудың келесі сатысы қажет" },
   USER_DEFERRED: { ru: "Отложено сотрудником", en: "Deferred by employee", kk: "Қызметкер кейінге қалдырды" },
-  MANDATORY: { ru: "Обязательное — назначает HR, не рекомендуется", en: "Mandatory — assigned by HR, not recommended", kk: "Міндетті — HR тағайындайды, ұсынылмайды" },
+  MANDATORY: { ru: "Обязательное: назначает HR, не рекомендуется", en: "Mandatory: assigned by HR, not recommended", kk: "Міндетті: HR тағайындайды, ұсынылмайды" },
   ALREADY_COMPLETED: { ru: "Уже пройдено", en: "Already completed", kk: "Өтіліп қойған" },
   SNOOZED: { ru: "Отложено до следующего раза", en: "Snoozed", kk: "Кейінге қалдырылған" },
 };
@@ -623,14 +623,14 @@ export const INTERVENTION_TEXT: Record<string, Tri> = {
   schedule_session: { ru: "Запланировать новую сессию", en: "Schedule a new session", kk: "Жаңа сессия жоспарлау" },
   add_preparatory_module: { ru: "Добавить подготовительный модуль", en: "Add a preparatory module", kk: "Дайындық модулін қосу" },
   add_next_level_activity: { ru: "Добавить следующую ступень обучения", en: "Add the next learning level", kk: "Оқытудың келесі сатысын қосу" },
-  none_user_choice: { ru: "Действий не нужно — выбор сотрудника", en: "No action — employee's choice", kk: "Әрекет қажет емес — қызметкер таңдауы" },
+  none_user_choice: { ru: "Действий не нужно: это выбор сотрудника", en: "No action needed: employee's choice", kk: "Әрекет қажет емес: бұл қызметкердің таңдауы" },
 };
 
 export const HEALTH_TEXT: Record<string, Tri> = {
   INSUFFICIENT_HISTORY: { ru: "Недостаточно данных для вывода о привычном формате", en: "Not enough data to infer a preferred format", kk: "Әдеттегі формат туралы қорытынды жасауға деректер жеткіліксіз" },
   IN_PROGRESS: { ru: "Есть добровольная активность в процессе", en: "A voluntary activity is in progress", kk: "Орындалып жатқан ерікті белсенділік бар" },
   RECENT_ACTIVITY: { ru: "Есть завершённая добровольная активность за последние 90 дней", en: "A voluntary activity was completed in the last 90 days", kk: "Соңғы 90 күнде аяқталған ерікті белсенділік бар" },
-  FORMAT_REVIEW_SUGGESTED: { ru: "Несколько пропусков за 180 дней — стоит пересмотреть формат или нагрузку, а не мотивацию", en: "Several misses in 180 days — review format or load, not motivation", kk: "180 күнде бірнеше рет өткізіп алу — мотивацияны емес, формат пен жүктемені қайта қарау керек" },
+  FORMAT_REVIEW_SUGGESTED: { ru: "Несколько пропусков за 180 дней: стоит пересмотреть формат или нагрузку, а не мотивацию", en: "Several misses in 180 days: review format or load, not motivation", kk: "180 күнде бірнеше рет өткізіп алу: мотивацияны емес, формат пен жүктемені қайта қарау керек" },
   NO_RECENT_COMPLETION_OBSERVED: { ru: "В загруженной истории не найдено завершений за 180 дней", en: "No completions found in the loaded history for 180 days", kk: "Жүктелген тарихта 180 күнде аяқталған белсенділік табылмады" },
   OBSERVED_HISTORY_AVAILABLE: { ru: "История участия доступна", en: "Participation history available", kk: "Қатысу тарихы қолжетімді" },
 };
@@ -641,22 +641,22 @@ function renderFactKk(f: Fact, skill: (id: string) => string, event: (id: string
     case "PROFILE_CONTEXT":
       return `Сіз ${v.role}, грейд ${v.grade}, еңбек өтілі ${v.tenure_months} ай.`;
     case "TARGET_CONTEXT":
-      return `${t("target")}: ${v.target_role} ${v.target_grade} — ${t("src_" + v.source).toLowerCase()}.`;
+      return `${t("target")}: ${v.target_role} ${v.target_grade} (${t("src_" + v.source).toLowerCase()}).`;
     case "REQUIREMENT":
-      return `Мақсат ${skill(v.skill_id)} кемінде ${v.required} болуын талап етеді${v.critical ? " — сыни дағды" : ""}.`;
+      return `Мақсат ${skill(v.skill_id)} кемінде ${v.required} болуын талап етеді${v.critical ? " (сыни дағды)" : ""}.`;
     case "SKILL_GAP":
       return `${skill(v.skill_id)}: қазір ${v.current}, қажет ${v.required}, алшақтық ${v.gap}.`;
     case "EVENT_EFFECT":
       return `${skill(v.skill_id)} ${v.before}→${v.after} береді (gain ${v.gain}, шегі ${v.cap})${v.gap_after != null ? `, кейінгі алшақтық: ${v.gap_after}` : ""}.`;
     case "HISTORY_INSUFFICIENT":
-      return `Ұқсас белсенділіктер бойынша деректер әлі жеткіліксіз (${v.total_nonmandatory_terminal_observations ?? v.observations} ерікті жазба) — тарих таңдауға әсер етпеді.`;
+      return `Ұқсас белсенділіктер бойынша деректер әлі жеткіліксіз (${v.total_nonmandatory_terminal_observations ?? v.observations} ерікті жазба); тарих таңдауға әсер етпеді.`;
     case "HISTORY_GROUP": {
       const g = GROUP.kk[v.group] ?? v.group;
       const neg = v.no_show + v.dropped + v.declined;
       return `Тарих (${g}): аяқталды ${v.completed}, өткізілді/тасталды/бас тартылды ${neg}, барлығы ${v.n}; сәйкестік ${v.affinity}.`;
     }
     case "ELIGIBLE": {
-      if (v.action_kind === "continue") return "Бастап қойғансыз — қайта жазылмай жалғастыруға болады.";
+      if (v.action_kind === "continue") return "Бастап қойғансыз, қайта жазылмай жалғастыруға болады.";
       const pre = Object.entries(v.prerequisites || {})
         .map(([s, l]) => `${skill(s)} ≥ ${l}`)
         .join(", ");
