@@ -1,9 +1,9 @@
 name: ci
 
+# manual trigger only: actions are disabled for this org (billing lock), auto-runs would
+# mark every commit red; the same checks run locally via `npm run check`
 on:
-  pull_request:
-  push:
-    branches: [main]
+  workflow_dispatch:
 
 jobs:
   backend:

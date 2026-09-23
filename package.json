@@ -7,7 +7,8 @@
     "dev:api": "uv run uvicorn api.index:app --reload --port 8000",
     "build": "next build",
     "start": "next start",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "check": "uv run ruff format --check . && uv run ruff check . && uv run pytest -q && next build"
   },
   "dependencies": {
     "next": "^15.5.26",
