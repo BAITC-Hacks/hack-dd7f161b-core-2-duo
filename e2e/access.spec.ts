@@ -12,8 +12,9 @@ test("employee cannot view another employee through an HR profile URL", async ({
   const response = await forbiddenResponse;
 
   expect(response.status()).toBe(403);
-  expect(response.request().headers()["x-role"]).toBe("employee");
-  expect(response.request().headers()["x-actor"]).toBe("E0028");
+  // identity comes only from the signed bearer token, never from role headers
+  expect(response.request().headers()["authorization"]).toMatch(/^Bearer /);
+  expect(response.request().headers()["x-role"]).toBeUndefined();
   await expect(page.getByText("Нет доступа к этому профилю", { exact: true })).toBeVisible();
 
   // The denied route must show neither the other employee's profile nor their development data.

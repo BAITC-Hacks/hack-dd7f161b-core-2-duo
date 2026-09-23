@@ -1,15 +1,24 @@
 import json
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Annotated, Any
 
 # vercel runs this file as the function entry; make the shared package importable
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from fastapi import FastAPI, File, Header, HTTPException, UploadFile  # noqa: E402
+from fastapi import (  # noqa: E402
+    Depends,
+    FastAPI,
+    File,
+    Header,
+    HTTPException,
+    Response,
+    UploadFile,
+)
 from pydantic import BaseModel, Field  # noqa: E402
 
 from career_quest.ai import active_model, select_actions  # noqa: E402
+from career_quest.auth import Principal, SessionStore, SignedTokenStore  # noqa: E402
 from career_quest.dataset import (  # noqa: E402
     Dataset,
     ValidationError,
@@ -24,6 +33,7 @@ from career_quest.hr import hr_dashboard  # noqa: E402
 app = FastAPI(title="Career Quest API", docs_url="/api/py/docs", openapi_url="/api/py/openapi.json")
 
 _ai_cache: dict[str, dict] = {}
+session_store: SessionStore = SignedTokenStore()
 
 
 class Overlay(BaseModel):
@@ -45,6 +55,45 @@ class SimulateRequest(StateRequest):
     steps: list[str]
 
 
+class LoginRequest(BaseModel):
+    login: str
+    password: str
+    overlay: Overlay = Field(default_factory=Overlay)
+
+
+def _bearer_token(authorization: Annotated[str | None, Header()] = None) -> str:
+    parts = (authorization or "").split()
+    if len(parts) != 2 or parts[0].lower() != "bearer":
+        raise HTTPException(
+            401, {"code": "UNAUTHENTICATED"}, headers={"WWW-Authenticate": "Bearer"}
+        )
+    return parts[1]
+
+
+AuthToken = Annotated[str, Depends(_bearer_token)]
+
+
+def _session_principal(token: AuthToken) -> Principal:
+    principal = session_store.resolve(token)
+    if principal is None:
+        raise HTTPException(
+            401, {"code": "UNAUTHENTICATED"}, headers={"WWW-Authenticate": "Bearer"}
+        )
+    return principal
+
+
+AuthenticatedPrincipal = Annotated[Principal, Depends(_session_principal)]
+
+
+def _hr_principal(principal: AuthenticatedPrincipal) -> Principal:
+    if principal.role != "hr":
+        raise HTTPException(403, {"code": "HR_ONLY"})
+    return principal
+
+
+HrPrincipal = Annotated[Principal, Depends(_hr_principal)]
+
+
 def _dataset(overlay: Overlay) -> Dataset:
     base = load_base_dataset()
     if not overlay.scenario:
@@ -55,14 +104,11 @@ def _dataset(overlay: Overlay) -> Dataset:
         raise HTTPException(422, {"code": "SCENARIO_INVALID", "errors": e.errors[:50]}) from e
 
 
-def _authorize(ds: Dataset, employee_id: str, role: str | None, actor: str | None) -> None:
+def _authorize(ds: Dataset, employee_id: str, principal: Principal) -> None:
+    if principal.role != "hr" and principal.employee_id != employee_id:
+        raise HTTPException(403, {"code": "FORBIDDEN"})
     if employee_id not in ds.employees:
         raise HTTPException(404, {"code": "EMPLOYEE_NOT_FOUND"})
-    if role == "hr":
-        return
-    if role == "employee" and actor == employee_id:
-        return
-    raise HTTPException(403, {"code": "FORBIDDEN"})
 
 
 def _skill_names(ds: Dataset) -> dict[str, str]:
@@ -84,6 +130,27 @@ def _public(snap: dict) -> dict:
 def health() -> dict:
     ds = load_base_dataset()
     return {"status": "ok", "employees": len(ds.employees), "as_of": ds.as_of.isoformat()}
+
+
+@app.post("/api/py/auth/login")
+def login(req: LoginRequest, response: Response) -> dict:
+    token = session_store.create(req.login, req.password, _dataset(req.overlay))
+    principal = session_store.resolve(token) if token is not None else None
+    if principal is None:
+        raise HTTPException(401, {"code": "INVALID_CREDENTIALS"})
+    response.headers["Cache-Control"] = "no-store"
+    return {
+        "token": token,
+        "role": principal.role,
+        "employee_id": principal.employee_id,
+        "expires_at": principal.expires_at,
+    }
+
+
+@app.post("/api/py/auth/logout")
+def logout(principal: AuthenticatedPrincipal, token: AuthToken) -> dict:
+    session_store.revoke(token)
+    return {"ok": True}
 
 
 @app.post("/api/py/meta")
@@ -133,11 +200,10 @@ def meta(req: StateRequest) -> dict:
 def employee_snapshot(
     employee_id: str,
     req: StateRequest,
-    x_role: str | None = Header(None),
-    x_actor: str | None = Header(None),
+    principal: AuthenticatedPrincipal,
 ) -> dict:
     ds = _dataset(req.overlay)
-    _authorize(ds, employee_id, x_role, x_actor)
+    _authorize(ds, employee_id, principal)
     return _public(build_snapshot(ds, employee_id, req.overlay.model_dump()))
 
 
@@ -145,11 +211,10 @@ def employee_snapshot(
 async def employee_ai(
     employee_id: str,
     req: StateRequest,
-    x_role: str | None = Header(None),
-    x_actor: str | None = Header(None),
+    principal: AuthenticatedPrincipal,
 ) -> dict:
     ds = _dataset(req.overlay)
-    _authorize(ds, employee_id, x_role, x_actor)
+    _authorize(ds, employee_id, principal)
     snap = build_snapshot(ds, employee_id, req.overlay.model_dump())
     model = active_model()
     cache_key = f"{snap['fingerprint']}:{req.locale}:{model}"
@@ -166,29 +231,24 @@ async def employee_ai(
 def employee_simulate(
     employee_id: str,
     req: SimulateRequest,
-    x_role: str | None = Header(None),
-    x_actor: str | None = Header(None),
+    principal: AuthenticatedPrincipal,
 ) -> dict:
     ds = _dataset(req.overlay)
-    _authorize(ds, employee_id, x_role, x_actor)
+    _authorize(ds, employee_id, principal)
     return simulate(ds, employee_id, req.overlay.model_dump(), req.steps)
 
 
 @app.post("/api/py/hr/dashboard")
-def dashboard(req: StateRequest, x_role: str | None = Header(None)) -> dict:
-    if x_role != "hr":
-        raise HTTPException(403, {"code": "HR_ONLY"})
+def dashboard(req: StateRequest, principal: HrPrincipal) -> dict:
     return hr_dashboard(_dataset(req.overlay), req.overlay.model_dump())
 
 
 @app.post("/api/py/hr/import/validate")
 async def import_validate(
+    principal: HrPrincipal,
     files: list[UploadFile] = File(...),
-    x_role: str | None = Header(None),
 ) -> dict:
     """Detect employees JSON / history CSV by content, validate, return a normalized scenario."""
-    if x_role != "hr":
-        raise HTTPException(403, {"code": "HR_ONLY"})
     base = load_base_dataset()
     employees: list[dict] = []
     history: list[dict] = []

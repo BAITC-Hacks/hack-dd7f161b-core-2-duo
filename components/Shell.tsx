@@ -1,13 +1,31 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { post } from "@/lib/api";
 import { translator } from "@/lib/i18n";
-import { Locale, setState, useAppState } from "@/lib/store";
+import { getState, Locale, setState, useAppState } from "@/lib/store";
 
 export function Topbar({ asOf, who }: { asOf?: string; who?: string }) {
   const s = useAppState();
   const t = translator(s.locale);
   const router = useRouter();
+  const [signingOut, setSigningOut] = useState(false);
+  const signOut = async () => {
+    if (signingOut) return;
+    setSigningOut(true);
+    try {
+      await post(s, "/auth/logout");
+    } catch {
+      // Always clear this browser's session, even if the server is unreachable.
+    } finally {
+      if (getState().session?.token === s.session?.token) {
+        setState((x) => ({ ...x, session: null }));
+        router.replace("/");
+      }
+      setSigningOut(false);
+    }
+  };
   return (
     <header className="topbar">
       <span className="brand">
@@ -29,12 +47,10 @@ export function Topbar({ asOf, who }: { asOf?: string; who?: string }) {
       {s.session && (
         <button
           className="btn small"
-          onClick={() => {
-            setState((x) => ({ ...x, session: null }));
-            router.push("/");
-          }}
+          disabled={signingOut}
+          onClick={signOut}
         >
-          {t("logout")}
+          {t(signingOut ? "signingOut" : "logout")}
         </button>
       )}
     </header>
