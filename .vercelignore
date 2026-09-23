@@ -1,3 +1,15 @@
+# deploys are made from a local checkout of main; keep untracked local files out
 .venv
+.next
+node_modules
 tests
 project-tz
+.claude
+.agents
+CLAUDE.md
+CLAUDE.local.md
+AGENTS.md
+.env
+.env.*
+!.env.example
+.DS_Store
