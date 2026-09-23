@@ -5,6 +5,8 @@ import { ApiError, post } from "@/lib/api";
 import { Meta, useApi } from "@/lib/hooks";
 import { HEALTH_TEXT, pick, reasonText, renderFact, translator } from "@/lib/i18n";
 import { AppState, currentOverlay, updateOverlay, useAppState } from "@/lib/store";
+import { CareerGraph } from "@/components/CareerGraph";
+import { CareerGraphData, GRAPH_COPY } from "@/lib/career-graph";
 
 type Fact = { id: string; category: string; code: string; values: Record<string, any> };
 type Cand = {
@@ -457,16 +459,22 @@ function Route(ctx: Ctx) {
   const { snap, t, skill, event } = ctx;
   const [sim, setSim] = useState(false);
   const best = snap.plan.best;
+  const graph: CareerGraphData = snap.career_graph;
+  const copy = GRAPH_COPY[ctx.s.locale];
+  const remaining = graph.nodes.filter((n) => n.kind === "skill" && n.required != null && n.planned < n.required);
   return (
     <section className="panel">
       <div className="section-head">
-        <h2>{t("route")}</h2>
+        <h2>Career Graph · {t("route")}</h2>
         <span className="small muted">{t("plan_" + snap.plan.status)}</span>
       </div>
+      <CareerGraph key={`${snap.dataset}:${ctx.employeeId}:${snap.fingerprint}`} graph={graph} locale={ctx.s.locale} skillName={skill} />
       {!best ? (
         <p className="muted">{snap.plan.status === "not_run" ? t("plan_not_run") : t("routeNone")}</p>
       ) : (
         <>
+          <details className="graph-compact-route">
+          <summary>{copy.route} · {copy.forecast}</summary>
           <ol className="route">
             {best.steps.map((st: any, i: number) => (
               <li key={st.event_id}>
@@ -491,6 +499,8 @@ function Route(ctx: Ctx) {
               </div>
             </li>
           </ol>
+          </details>
+          {remaining.length > 0 && <p className="small graph-note">{copy.remaining}: {remaining.map((n) => n.kind === "skill" ? `${n.label} ${n.planned}/${n.required}${n.critical ? " ★" : ""}` : "").join(" · ")}</p>}
           <div className="row">
             <button className="btn small" onClick={() => setSim(true)}>
               {t("whatIf")}
