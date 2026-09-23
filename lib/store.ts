@@ -3,7 +3,7 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 
 export type Locale = "ru" | "kk" | "en";
-export type Session = { role: "employee" | "hr"; actor?: string } | null;
+export type Session = { role: "employee" | "hr"; actor?: string; token: string } | null;
 
 export type Overlay = {
   completions: { employee_id: string; event_id: string; session_date: string | null; gaming: boolean }[];
@@ -36,7 +36,18 @@ function load() {
   loaded = true;
   try {
     const raw = window.localStorage.getItem(KEY);
-    if (raw) state = { ...initial, ...JSON.parse(raw) };
+    if (raw) {
+      state = { ...initial, ...JSON.parse(raw) };
+      // Old browser sessions only held a role/actor and cannot authenticate.
+      if (state.session && (
+        typeof state.session.token !== "string" || !state.session.token.trim() ||
+        !["employee", "hr"].includes(state.session.role) ||
+        (state.session.role === "employee" && typeof state.session.actor !== "string")
+      )) {
+        state = { ...state, session: null };
+        window.localStorage.setItem(KEY, JSON.stringify(state));
+      }
+    }
   } catch {
     // private mode or corrupted storage: start clean
   }
