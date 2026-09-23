@@ -44,6 +44,8 @@ export async function loginEmployee(page: Page, employeeId = "E0028") {
   const person = page.getByRole("button").filter({ hasText: employeeId });
   await expect(person).toHaveCount(1);
   await person.click();
+  // the password field is prefilled with the demo password; the server verifies it
+  await page.locator("#login-password-form").getByRole("button", { name: "Войти", exact: true }).click();
   await expect(page).toHaveURL(/\/me$/);
   // Some profiles prefer KK/EN; the common test vocabulary is Russian.
   await page.getByRole("group", { name: "language" }).getByRole("button", { name: "RU", exact: true }).click();
@@ -55,6 +57,7 @@ export async function loginEmployee(page: Page, employeeId = "E0028") {
 export async function loginHr(page: Page) {
   await page.goto("/");
   await page.getByRole("button", { name: "Войти как HR", exact: true }).click();
+  await page.locator("#login-password-form").getByRole("button", { name: "Войти", exact: true }).click();
   await expect(page).toHaveURL(/\/hr$/);
   await expect(page.locator(".card-stat")).toHaveCount(4);
 }
