@@ -489,8 +489,8 @@ export function renderFact(f: Fact, locale: Locale, skill: (id: string) => strin
         : `Даст ${skill(v.skill_id)} ${v.before}→${v.after} (gain ${v.gain}, потолок ${v.cap})${v.gap_after != null ? `, разрыв после: ${v.gap_after}` : ""}.`;
     case "HISTORY_INSUFFICIENT":
       return L
-        ? `Not enough similar history yet (${v.observations} voluntary records); history did not affect this choice.`
-        : `Данных о похожих активностях пока недостаточно (${v.observations} добровольных записей) — история не повлияла на выбор.`;
+        ? `Not enough similar history yet (${v.total_nonmandatory_terminal_observations ?? v.observations} voluntary records); history did not affect this choice.`
+        : `Данных о похожих активностях пока недостаточно (${v.total_nonmandatory_terminal_observations ?? v.observations} добровольных записей) — история не повлияла на выбор.`;
     case "HISTORY_GROUP": {
       const g = GROUP[locale][v.group] ?? v.group;
       const neg = v.no_show + v.dropped + v.declined;
@@ -583,7 +583,7 @@ function renderFactKk(f: Fact, skill: (id: string) => string, event: (id: string
     case "EVENT_EFFECT":
       return `${skill(v.skill_id)} ${v.before}→${v.after} береді (gain ${v.gain}, шегі ${v.cap})${v.gap_after != null ? `, кейінгі алшақтық: ${v.gap_after}` : ""}.`;
     case "HISTORY_INSUFFICIENT":
-      return `Ұқсас белсенділіктер бойынша деректер әлі жеткіліксіз (${v.observations} ерікті жазба) — тарих таңдауға әсер етпеді.`;
+      return `Ұқсас белсенділіктер бойынша деректер әлі жеткіліксіз (${v.total_nonmandatory_terminal_observations ?? v.observations} ерікті жазба) — тарих таңдауға әсер етпеді.`;
     case "HISTORY_GROUP": {
       const g = GROUP.kk[v.group] ?? v.group;
       const neg = v.no_show + v.dropped + v.declined;

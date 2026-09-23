@@ -464,16 +464,20 @@ def build_facts(cand: dict, ctx: dict) -> list[dict]:
             )
     h = cand["history"]
     if h["insufficient"]:
-        add("history", "HISTORY_INSUFFICIENT", observations=h["total_observations"])
+        add(
+            "history",
+            "HISTORY_INSUFFICIENT",
+            total_nonmandatory_terminal_observations=h["total_observations"],
+        )
     else:
         for name, grp in h["groups"].items():
             if not grp["insufficient"]:
+                scope = {name: cand[name]} if name in {"format", "type"} else {}
                 add(
                     "history",
                     "HISTORY_GROUP",
                     group=name,
-                    format=cand["format"],
-                    type=cand["type"],
+                    **scope,
                     n=grp["n"],
                     completed=grp["completed"],
                     no_show=grp["no_show"],
@@ -500,7 +504,13 @@ def build_facts(cand: dict, ctx: dict) -> list[dict]:
             )
             if after < g["required"]:
                 remaining.append(
-                    {"skill_id": g["skill_id"], "after": after, "required": g["required"]}
+                    {
+                        "skill_id": g["skill_id"],
+                        "after": after,
+                        "required": g["required"],
+                        "critical": True,
+                        "skill": ctx["skill_names"].get(g["skill_id"], g["skill_id"]),
+                    }
                 )
     if remaining:
         add("limitation", "CRITICAL_REMAINING", skills=remaining)
@@ -617,6 +627,7 @@ def build_snapshot(ds: Dataset, employee_id: str, overlay: dict, with_plan: bool
         }
     )
     ctx = {
+        "skill_names": {sid: skill["name"] for sid, skill in ds.skills.items()},
         "employee": employee,
         "skills": skills,
         "gaps": gaps,

@@ -94,3 +94,41 @@ def test_request_params_differ_for_reasoning_models():
     assert "temperature" not in reasoning
     assert "max_completion_tokens" in reasoning and "reasoning_effort" in reasoning
     assert "temperature" not in model_params("o4-mini")
+
+
+def _raw(eid, codes, explanation=""):
+    return {
+        "choices": [
+            {
+                "event_id": eid,
+                "evidence_ids": [f"{eid}:f01", f"{eid}:f02", f"{eid}:f03"],
+                "reason_codes": codes,
+                "explanation": explanation,
+            }
+        ]
+    }
+
+
+def test_rejects_malformed_output_shapes():
+    cands = [_cand("EV_1", 0, 50)]
+    assert validate_selection(None, cands)[0] == []
+    assert validate_selection({"choices": [{"event_id": 1}]}, cands)[0] == []
+    bad = _raw("EV_1", ["NOT_A_CODE"])
+    assert validate_selection(bad, cands)[0] == []
+
+
+def test_unproven_reason_codes_are_removed():
+    cands = [_cand("EV_1", 0, 50)]
+    cands[0]["action_kind"] = "start"
+    choices, problems = validate_selection(
+        _raw("EV_1", ["CONTINUE_STARTED", "TARGET_CRITICAL_GAP"]), cands
+    )
+    assert choices[0]["reason_codes"] == []
+    assert any("continue_reason_removed" in p for p in problems)
+    assert any("critical_gap_reason_removed" in p for p in problems)
+
+
+def test_gpt6_is_a_reasoning_model():
+    from career_quest.ai import model_params
+
+    assert "temperature" not in model_params("gpt-6-luna")
