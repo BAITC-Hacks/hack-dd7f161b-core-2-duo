@@ -1,10 +1,19 @@
 import json
+import os
 import sys
 from pathlib import Path
 from typing import Annotated, Any
 
 # vercel runs this file as the function entry; make the shared package importable
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+# local runs: read .env without overriding real environment variables
+_env_file = Path(__file__).resolve().parent.parent / ".env"
+if _env_file.exists():
+    for _line in _env_file.read_text("utf-8").splitlines():
+        _key, _sep, _value = _line.strip().partition("=")
+        if _sep and _key and not _key.startswith("#") and _key not in os.environ:
+            os.environ[_key] = _value
 
 from fastapi import (  # noqa: E402
     Depends,
@@ -300,10 +309,20 @@ async def import_validate(
             except json.JSONDecodeError as e:
                 errors.append({"path": f.filename, "code": "INVALID_JSON", "detail": str(e)})
                 continue
+            has_items = isinstance(data, list) or (isinstance(data, dict) and "employees" in data)
+            items = data if isinstance(data, list) else (data or {}).get("employees")
+            # every employee entry must be an object, otherwise validation would crash
+            if has_items and (
+                not isinstance(items, list) or not all(isinstance(e, dict) for e in items)
+            ):
+                errors.append(
+                    {"path": f.filename, "code": "INVALID_EMPLOYEES", "detail": "expected objects"}
+                )
+                continue
             if isinstance(data, list):
                 employees.extend(data)
                 warnings.append({"path": f.filename, "code": "WRAPPER_NORMALIZED", "detail": ""})
-            elif "employees" in data:
+            elif isinstance(data, dict) and "employees" in data:
                 employees.extend(data["employees"])
                 as_of = (data.get("meta") or {}).get("as_of_date")
                 if as_of and as_of != base.as_of.isoformat():

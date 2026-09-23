@@ -32,7 +32,7 @@ export function Topbar({ asOf, who }: { asOf?: string; who?: string }) {
         <span className="brand-mark" aria-hidden />
         Career Quest
       </span>
-      <span className={`chip ${s.scenarioKey === "check" ? "amber" : "grey"}`}>
+      <span className={`chip scenario-chip ${s.scenarioKey === "check" ? "amber" : "grey"}`}>
         {s.scenarioKey === "check" ? `${t("scenarioCheck")}: ${s.scenario?.name ?? ""}` : t("scenarioBase")}
       </span>
       {asOf && (

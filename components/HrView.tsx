@@ -260,7 +260,11 @@ function DataSection() {
         {t("uploadLead")}
       </p>
       <div className="row">
-        <input type="file" multiple accept=".json,.csv" onChange={(e) => setFiles(Array.from(e.target.files ?? []))} />
+        <input type="file" multiple accept=".json,.csv" onChange={(e) => {
+            // a new file selection invalidates the previous validation result
+            setFiles(Array.from(e.target.files ?? []));
+            setReport(null);
+          }} />
         <button
           className="btn"
           disabled={!files.length || busy}
