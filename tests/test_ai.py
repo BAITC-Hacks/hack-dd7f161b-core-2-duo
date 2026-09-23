@@ -76,3 +76,21 @@ def test_ungrounded_numbers_drop_explanation_and_favorable_history_removed():
     assert choices[0]["explanation"] == ""
     assert "HISTORY_FAVORABLE" not in choices[0]["reason_codes"]
     assert any("ungrounded" in p for p in problems)
+
+
+def test_schema_requires_three_choices_when_available():
+    from career_quest.ai import _schema
+
+    assert _schema(["A", "B", "C", "D"], ["f"])["properties"]["choices"]["minItems"] == 3
+    assert _schema(["A", "B"], ["f"])["properties"]["choices"]["minItems"] == 2
+
+
+def test_request_params_differ_for_reasoning_models():
+    from career_quest.ai import model_params
+
+    chat = model_params("gpt-4.1")
+    assert chat["temperature"] == 0.1 and "max_tokens" in chat
+    reasoning = model_params("gpt-5")
+    assert "temperature" not in reasoning
+    assert "max_completion_tokens" in reasoning and "reasoning_effort" in reasoning
+    assert "temperature" not in model_params("o4-mini")
