@@ -7,6 +7,7 @@ from datetime import date, timedelta
 
 from career_quest.dataset import REPEATABLE_EVENTS, Dataset, Event, Record
 from career_quest.goals import calculate_gaps, readiness, resolve_target, target_requirements
+from career_quest.graph import build_career_graph
 from career_quest.history import candidate_history, development_health
 from career_quest.progression import actual_gain, apply_activity, replay
 
@@ -860,6 +861,9 @@ def build_snapshot(ds: Dataset, employee_id: str, overlay: dict, with_plan: bool
         ],
         "no_step_reasons": no_step,
         "plan": {k: v for k, v in plan.items() if k != "by_first"},
+        "career_graph": build_career_graph(
+            ds, target, skills, required, critical, catalog, plan, active
+        ),
         "catalog": catalog,
         "history": [
             {
