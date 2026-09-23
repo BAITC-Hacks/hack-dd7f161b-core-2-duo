@@ -39,3 +39,9 @@ dist/
 .vscode/
 
 project-tz/
+# node / next
+node_modules/
+.next/
+next-env.d.ts
+*.tsbuildinfo
+.vercel

@@ -1,0 +1,8 @@
+{
+  "functions": {
+    "api/index.py": {
+      "includeFiles": "{career_quest/**,data/dataset/**}",
+      "maxDuration": 30
+    }
+  }
+}
