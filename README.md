@@ -1,113 +1,219 @@
-# Career Quest: explainable development navigator
+# Career Quest — объяснимый навигатор развития сотрудника
 
-HackAlem AI, Halyk Bank track, case "Career Quest".
+**Развёрнутая версия:** https://career-quest-bay.vercel.app
 
-The app gives an employee **1–3 next development steps**. Each step comes with an explanation built from checkable facts. The app also shows a **route of up to 4 activities** to the goal and a what-if preview. HR gets a view of **skills that fall short, why the catalog can't close them, and who has no step**.
+HackAlem AI, трек Halyk Bank, кейс «Career Quest».
 
-The core of the case is the quality and explainability of the recommendation. That's why the numbers are computed by a deterministic core. The LLM chooses among valid options and wording, and the server checks its answer.
+![Экран сотрудника: цель, готовность, следующий шаг с объяснением AI](docs/screenshots/employee.png)
 
-## Quick start
+## 1. Краткое описание
 
-```bash
-# requirements: Python 3.12 + uv, Node.js >= 20
-uv sync
-npm install
-cp .env.example .env        # put OPENAI_API_KEY here (optional; without it the rules-based fallback is shown honestly)
-npm run dev                 # FastAPI :8000 + Next.js :3000 with one command
-```
+**Проблема.** Сотрудник получает поток разрозненных HR-событий и не видит, зачем ему конкретная активность и куда она ведёт. Поэтому обучение проходится формально, а на добровольные активности приходят немногие. HR не видит, какие компетенции проседают и почему у части людей нет понятного следующего шага.
 
-Open http://localhost:3000 and sign in as an employee (search by name/ID) or as HR.
+**Для кого.**
+- Сотрудник со стажем 1–5 лет — видит свою траекторию и получает объяснимый следующий шаг.
+- HR — видит дефициты навыков, ограничения каталога обучения и тех, у кого нет шага.
 
-Tests:
+**Что делает решение.** По профилю, истории участия и требованиям следующего грейда подбирает 1–3 активности. Для каждой показывает обоснование: минимум три фактора, каждый ссылается на конкретные данные. После выполнения активности пересчитывает навыки, готовность и маршрут. Для HR строит срез по проседающим навыкам с причинами.
 
-```bash
-uv run pytest -q            # calculation core, AI response validation, full dataset
-npm run build               # typecheck + frontend build
-npm run check               # all at once: ruff format/lint + pytest + next build
-```
+## 2. Что реализовано
 
-CI: `.github/workflows/ci.yml` runs the same steps. It's triggered manually (`workflow_dispatch`), because GitHub Actions is unavailable in the hackathon organization. Before merging, run `npm run check` locally.
+**Сотрудник («Мой путь»)**
+- Профиль: роль, грейд, подразделение, стаж, дата последней оценки.
+- Цель и готовность по навыкам. Цель берётся из профиля, выбирается вручную или рассчитывается как следующий грейд — источник цели подписан.
+- **Следующий шаг:** главный шаг и до двух альтернатив. У каждой:
+  - текст объяснения от AI;
+  - список проверяемых фактов;
+  - «Почему этот шаг?» — все факты и разбор оценки кандидата;
+  - «Почему не другой?» — самый низкий навык, другие кандидаты и заблокированные активности с причинами.
+- **«Что изменится?»** — прогноз навыков и готовности без изменения данных (what-if).
+- **«Отметить выполненным»** — навыки, готовность и маршрут пересчитываются, показывается изменение в процентных пунктах.
+- **«Не сейчас»** — отложить шаг без штрафа.
+- **Маршрут до цели** — последовательность до 4 активностей с учётом prerequisites, потолков навыков и дат сессий.
+- **Навыки** — шкала 0–5 для каждого навыка: оценка, рассчитано по истории, требуется. По кнопке ⓘ видна формула для каждой записи истории.
+- Вкладки «Активности» (каталог с причинами недоступности), «История» (участие и состояние истории развития), «Настройки»: учёт истории, добровольные XP и бейджи, сброс отметок.
+- Языки RU / KK / EN.
 
-### Vercel deployment
+**HR**
+- Карточки: сотрудники, открытые критические разрывы, «без исполнимого шага», «требования цели выполнены».
+- **«Навыки и ограничения»:** для каждого навыка — сколько людей ниже требования и с критическим разрывом, сколько активностей в каталоге, у скольких есть шаг / путь через подготовку / нет шага. Там же причины (bottleneck detector) и черновик «Что можно изменить в каталоге».
+- **«Нет шага»:** кто без рекомендованного шага и почему, с уровнем доказательности причины.
+- **«Участие»:** завершаемость, явка и отзывы по активностям. Добровольные и обязательные активности показаны раздельно.
+- **«Данные»:** загрузка проверочных профилей жюри (`employees.json` + `activity_history.csv`) → отчёт валидации → изолированный проверочный сценарий.
 
-One project: Next.js (frontend) + `api/index.py` (FastAPI as a Python Serverless Function, see `vercel.json`).
-Environment variables in the Vercel project: `OPENAI_API_KEY` (required for the AI layer) and `OPENAI_MODEL` (default `gpt-4.1`). Measured on production: gpt-4.1 answers in 1.7–4.3 s, while gpt-5 with `reasoning_effort=low` does not fit the 9 s budget. Reasoning models are supported (`OPENAI_REASONING_EFFORT`).
+![HR: какие навыки проседают и что мешает их развивать](docs/screenshots/hr.png)
 
-```bash
-npx vercel login && npx vercel --prod
-```
+## 3. Как работает решение
 
-## Architecture
+Сценарий от входных данных до результата:
+
+1. **Навыки на дату среза.** Берётся последняя оценка (`employees.json`), затем применяются завершённые активности из истории после `last_review_date`. Правило датасета:
+   `actual_gain = max(0, min(gain, max_level − current, 5 − current))`. Навык никогда не понижается, незавершённая активность прироста не даёт.
+2. **Цель.** Выбор сотрудника → `career_goal` из профиля → следующий грейд той же роли (предварительный сценарий) → для Lead без цели — соответствие текущей роли.
+3. **Разрывы и готовность.** `gap = max(0, required − current)`, критические навыки весят ×2.
+   `readiness = Σ w·min(x, r) / Σ w·r`. Это покрытие требований, а не вероятность повышения.
+4. **Допуск.** Активность можно рекомендовать, если выполнены все условия:
+   - она не обязательная;
+   - подходит текущей роли и грейду;
+   - выполнены prerequisites;
+   - ещё не пройдена (кроме повторяемого клуба `EV_036`);
+   - есть будущая сессия или она в своём темпе (self-paced);
+   - сотрудник её не отложил.
+
+   Начатая активность предлагается как «продолжить».
+5. **Маршрут.** Ограниченный beam search: глубина 4, ширина 40, горизонт 120 дней. Состояние поиска хранит весь вектор навыков, поэтому AND-prerequisites и потолки учитываются корректно.
+6. **Ранжирование.** Сначала приоритетные группы:
+   - 0 — сокращает критический разрыв или открывает к нему путь;
+   - 1 — сокращает другой разрыв;
+   - 2 — подготовительный шаг.
+
+   Внутри группы — оценка кандидата:
+   `60·G + 25·C + 20·U + 10·(2·affinity − 1) + 3·feedback + бонус формата + бонус продолжения − нагрузка − ожидание`.
+   `affinity` — соответствие истории участия: похожий формат (0.5), тип (0.2) и навыки (0.3), с затуханием по давности. При недостатке данных значение нейтральное — 0.5, и объяснение прямо это сообщает.
+7. **Факты-обоснования.** Для каждого кандидата сервер собирает факты: профиль и грейд, требование цели, разрыв, эффект активности, история участия, допуск и сессия, оставшиеся критические разрывы.
+8. **AI-слой (OpenAI, gpt-4.1)** получает минимизированный контекст: без имени и ID, до 8 допустимых кандидатов с фактами. Модель выбирает 1–3 шага **только из этого списка**, подбирает подтверждающие факты и пишет 2–3 предложения объяснения на языке пользователя. Затем **сервер проверяет ответ**:
+   - ID активностей только из списка кандидатов;
+   - главный шаг — из минимальной приоритетной группы;
+   - факты покрывают ≥ 3 категорий, включая историю;
+   - каждое число в тексте присутствует в выбранных фактах, иначе текст отбрасывается.
+
+   При ошибке или таймауте (9 с) интерфейс честно пишет «Рекомендация рассчитана по правилам; AI сейчас недоступен».
+9. **Нет шага — тоже ответ.** Возвращается 0 рекомендаций с точной причиной: `TARGET_REQUIREMENTS_MET`, `NO_RELEVANT_CATALOG_EVENT`, `SKILL_CAP_CEILING`, `AUDIENCE_MISMATCH`, `PREREQUISITES_UNMET`, `ONLY_ALREADY_COMPLETED_EVENTS` и т. д.
+
+**Почему правило «бери минимальный навык» здесь не срабатывает.** Тест `tests/test_core.py::test_multi_factor_recommendation_beats_lowest_skill_rule`: самый низкий навык — Public Speaking, по нему три неявки, а для Senior критичен System Design. Выбирается System Design (группа 0), в объяснении есть факт истории.
+
+## 4. Технологии
+
+| Слой | Что используется |
+|---|---|
+| Расчётное ядро и API | Python 3.12, FastAPI, Pydantic 2, httpx |
+| Фронтенд | Next.js 15 (App Router), React 19, TypeScript (strict), CSS без UI-фреймворков, шрифты Onest и Unbounded (Google Fonts) |
+| AI | OpenAI Chat Completions API, модель `gpt-4.1`, structured output (JSON Schema, strict) |
+| Тесты и качество | pytest, ruff; сквозной сценарий в браузере проверялся Playwright |
+| Инструменты | uv (Python), npm (Node) |
+| Развёртывание | Vercel (Next.js + FastAPI как Python Serverless Function), Docker Compose для локального запуска |
+
+Выбор модели измерен на production на 5 сотрудниках:
+- **gpt-4.1** — 5/5 ответов прошли серверную проверку, 1.7–4.3 с;
+- **gpt-5** с `reasoning_effort=low` — 5/5 не уложились в 9 с.
+
+Модель задаётся переменной `OPENAI_MODEL`. Reasoning-модели поддерживаются (`OPENAI_REASONING_EFFORT`).
+
+## 5. Архитектура
 
 ```text
-data/dataset/*.json|csv  ─┐
-uploaded check scenario  ─┤→ career_quest (pure Python functions, no HTTP/DB)
-localStorage overlay     ─┘     dataset.py      loading, validation of jury profiles
-(completions, goals,             progression.py  gain/max_level rule, replay of history after the review
- snoozes, settings)              goals.py        effective target, gaps, readiness
-                                 history.py      affinity by format/type/skills, development health
-                                 engine.py       eligibility, beam search route, ranking, evidence facts, what-if
-                                 hr.py           skill deficits, bottleneck detector, participation
-                                 ai.py           OpenAI: choosing from the shortlist + server-side validation
-                         api/index.py (FastAPI) → Next.js 15 (app/, components/, lib/)
+data/dataset/*.json|csv ─────┐
+проверочный сценарий (HR) ───┤
+состояние браузера ──────────┘
+(отметки, цели, настройки)
+            │ каждый запрос несёт состояние
+            ▼
+api/index.py (FastAPI, /api/py/*) ── проверка роли: сотрудник видит только себя
+            │
+            ▼
+career_quest/            чистые функции, без HTTP и БД
+  dataset.py             загрузка датасета, валидация профилей жюри
+  progression.py         правило gain/max_level, пересчёт навыков по истории
+  goals.py               цель, разрывы, готовность
+  history.py             соответствие истории, состояние истории развития
+  engine.py              допуск, маршрут (beam search), ранжирование, факты, what-if
+  hr.py                  дефициты навыков, bottleneck detector, участие
+  ai.py                  вызов OpenAI + серверная проверка ответа
+            │
+            ▼
+Next.js (app/, components/, lib/) ── экраны сотрудника и HR
 ```
 
-**Storage.** Source data ships with the deployment, so a first-time visitor sees all 200 employees at once. User actions are the "overlay": completion marks, chosen goal, snoozes, gamification and personalization settings, the uploaded check scenario. They live in the browser's `localStorage` and survive a page reload. The server is stateless: every request carries the overlay, and the server recomputes the whole state through the same core. That makes it impossible to double-count a completion. Tradeoff: state isn't shared across devices (see Limitations).
+**Хранение.** Исходные данные поставляются вместе с приложением, поэтому новый посетитель сразу видит всех 200 сотрудников. Действия пользователя хранятся в `localStorage` браузера и переживают перезагрузку страницы:
+- отметки «выполнено»;
+- выбранная цель;
+- отложенные шаги;
+- настройки;
+- загруженный проверочный сценарий.
 
-**Single calculation core.** Recommendations, simulation, completion and the HR screen call the same functions. The frontend doesn't compute formulas.
+Сервер ничего не хранит: каждый запрос передаёт это состояние, и сервер пересчитывает всё тем же ядром. Поэтому одна отметка не может начислиться дважды.
 
-## Algorithm (project decisions, not official Halyk methodology)
+**Единое ядро.** Рекомендации, what-if, выполнение и HR-экран вызывают одни и те же функции. Фронтенд формул не считает.
 
-1. **Current skills** = the last assessment + `completed` records after `last_review_date` (up to the snapshot date `2026-10-01`), applied through
-   `actual_gain = max(0, min(gain, max_level − current, 5 − current))`. A skill never goes down. The CSV date is marked as a proxy completion date. The UI shows the formula for each record.
-2. **Goal:** user's choice → `career_goal` from the profile → the next grade of the same role (a provisional scenario, labeled as such) → for a Lead, fit with the current role.
-3. **Gaps and readiness:** `gap = max(0, required − current)`. Critical skills have weight 2.
-   `readiness = Σ w·min(x,r) / Σ w·r`. This is requirement coverage, not a promotion probability.
-4. **Eligibility of a step:** not mandatory, audience (current role/grade), prerequisites, not completed yet (except the `EV_036` club), a future session or self-paced, not snoozed. For `in_progress`, the step is "continue".
-5. **Route:** bounded beam search (depth 4, beam 40, horizon 120 days). The search state holds the whole skill vector, so AND-prerequisites and caps are handled correctly.
-6. **Ranking** (spec §10.4): tiers (0 — reduces a critical gap or opens a route to it; 1 — another goal gap; 2 — preparatory step), then
-   `60·G + 25·C + 20·U + 10·(2·affinity−1) + 3·feedback + format bonus + continue bonus − effort − wait`.
-   `affinity` uses history by format (0.5), type (0.2) and similar skills (0.3), with recency decay and smoothing. With fewer than 3 observations it is neutral at 0.5, and the explanation says so explicitly.
-7. **Evidence facts:** each card gets facts from ≥ 4 categories: profile/grade, target requirement, gap, history, activity effect, eligibility, remaining critical gaps.
-8. **Empty result is also an answer:** 0 recommendations with a precise reason (`TARGET_REQUIREMENTS_MET`, `NO_RELEVANT_CATALOG_EVENT`, `SKILL_CAP_CEILING`, `AUDIENCE_MISMATCH`, `PREREQUISITES_UNMET`, …) and a proof level.
+## 6. Установка и запуск
 
-**Why "take the lowest skill" doesn't work:** in `tests/test_core.py::test_multi_factor_recommendation_beats_lowest_skill_rule` the lowest skill is Public Speaking with three past no-shows, while System Design is critical for Senior. The engine picks System Design (tier 0), and the explanation includes the history fact.
+**Вариант A — одной командой через Docker**
 
-## The AI layer's role (fair description)
+```bash
+git clone https://github.com/BAITC-Hacks/hack-dd7f161b-core-2-duo.git
+cd hack-dd7f161b-core-2-duo
+cp .env.example .env              # впишите OPENAI_API_KEY (без ключа AI честно переключится на правила)
+docker compose up --build
+```
 
-- The model gets a **minimized context**: no name, no ID, no manager. It sees role/grade, the goal, relevant gaps, and up to 8 valid candidates with their facts.
-- The model **picks 1–3 steps from the shortlist only** (a JSON Schema with an enum of event_id and fact IDs), orders them, picks the supporting facts, and writes 2–3 sentences of explanation in the user's language.
-- The server **validates** the answer (`career_quest/ai.py::validate_selection`):
-  - IDs come from the shortlist only;
-  - the main step belongs to the minimum tier and is within 15 points of the best one;
-  - facts belong to their own candidate and cover ≥ 3 categories, including history;
-  - `HISTORY_FAVORABLE` is rejected when history is insufficient;
-  - **every number in the text must be present in the chosen facts**, otherwise the text is dropped.
-- On a missing key, timeout (9 s), network error or invalid answer, the UI shows "Recommendation calculated by rules; AI is unavailable" with the reason. A template is never passed off as AI.
-- Protection from prompt injection: no tools, a strict schema and server-side validation (test `test_rejects_injected_unknown_event`).
-- The model is set by `OPENAI_MODEL`. There is no trained ML model for forecasting in the project.
+Откройте http://localhost:3000 (API — http://localhost:8000/api/py/docs).
 
-## Main scenario (demo)
+**Вариант B — без Docker** (нужны Python 3.12 + [uv](https://docs.astral.sh/uv/) и Node.js 22):
 
-1. Sign in as an employee → "My path": profile, goal and readiness, the main step and alternatives with an AI status, route, skill ruler (assessed / from history / required).
-2. "Why this step?" shows all facts and the score breakdown. "Why not another?" shows the lowest skill, other candidates and blocked activities with reasons.
-3. "What changes?" is a what-if with no data changes. "Mark as done" moves skills, readiness and route (a toast shows the delta in percentage points).
-4. Sign in as HR → "Skills and constraints": critical gaps, catalog coverage (has a step / via preparation / no step), bottleneck reasons and a draft of what to change in the catalog. "No next step": the list with reasons. "Participation": voluntary and mandatory activities shown separately.
-5. "Data" → upload `employees.json` + `activity_history.csv` of the check profiles → validation report → an isolated check scenario (catalog from the original set, employees and history from the files only).
+```bash
+uv sync
+npm install
+cp .env.example .env
+npm run dev                       # FastAPI :8000 + Next.js :3000
+```
 
-## Constraints of the case being respected
+**Переменные окружения** (`.env.example`):
 
-- No public ratings of people. HR lists are sorted by ID, not by "quality".
-- Mandatory activities are not recommended and give no XP.
-- Gamification (XP, badges) is off by default, voluntary, and doesn't affect skills or recommendations.
-- The employee sees only their own profile. The server checks the `x-role`/`x-actor` headers and returns 403 for someone else's ID. The HR API is for HR only.
-- "Not now" doesn't create a `declined` entry and doesn't penalize.
+| Переменная | Назначение |
+|---|---|
+| `OPENAI_API_KEY` | Ключ OpenAI. Используется только на сервере, в браузер не передаётся. |
+| `OPENAI_MODEL` | По умолчанию `gpt-4.1` |
+| `OPENAI_BASE_URL` | Опционально: любой OpenAI-совместимый endpoint |
 
-## Limitations (honestly)
+**Развёртывание на Vercel:** `npx vercel deploy --prod` из корня репозитория. Переменная `OPENAI_API_KEY` задаётся в настройках проекта Vercel.
 
-- **Demo auth:** the role is picked on the sign-in screen, and permissions are checked on the server based on it. There are no real accounts or passwords.
-- **State is in the browser:** marks and the check scenario are local to the browser. On another device the user sees the clean original dataset.
-- The route dates are a sequence estimate (self-paced 4 h/day, scheduled ceil(h/8) days), not a booking.
-- Readiness and route are not promotion forecasts. The dataset has no capacity or budget data, so HR doesn't get conclusions about a shortage of seats.
-- Localization: RU and EN are full; KK covers the main interface, and the rest falls back to Russian. Catalog titles stay in English, as in the dataset.
-- The data is synthetic and belongs to the hackathon organizer's dataset.
+## 7. Как проверить решение
+
+**Тесты:**
+
+```bash
+npm run check    # ruff format/lint + pytest (17 тестов) + сборка фронтенда с проверкой типов
+```
+
+**Сценарий для жюри** (на https://career-quest-bay.vercel.app или локально):
+
+1. На экране входа найдите `E0028` и нажмите на сотрудника.
+2. «Мой путь». Статус над карточками — «Выбор AI проверен сервером · gpt-4.1». У главного шага есть текст AI и факты.
+3. «Почему этот шаг?» — все факты и разбор оценки. «Почему не другой?» — почему не самый низкий навык.
+4. «Что изменится?» — прогноз готовности (для E0028 74.1% → 75.9%).
+5. «Отметить выполненным» — готовность меняется на ту же величину, рекомендации и маршрут пересчитываются. Перезагрузите страницу: состояние сохраняется.
+6. «Выйти» → «Войти как HR»:
+   - «Навыки и ограничения» → «Что можно изменить в каталоге» у Leadership;
+   - «Нет шага» → «Открыть профиль»;
+   - «Участие» — переключатель «добровольное / обязательное».
+7. «Данные» — загрузите `employees.json` и `activity_history.csv` в формате датасета → «Проверить» → «Создать сценарий». Шапка переключится на «Проверочный сценарий», а HR-экран и профили будут считаться только по загруженным людям.
+8. Разграничение прав:
+
+   ```bash
+   curl -s -X POST https://career-quest-bay.vercel.app/api/py/employees/E0028 \
+     -H 'content-type: application/json' -H 'x-role: employee' -H 'x-actor: E0001' -d '{}' -o /dev/null -w '%{http_code}\n'
+   # 403 — сотрудник не может открыть чужой профиль
+   ```
+
+## 8. Данные и интеграции
+
+- **Датасет организатора** (`data/dataset/`, синтетические данные, дата среза 2026-10-01):
+  - `employees.json` — 200 профилей;
+  - `events.json` — 40 активностей;
+  - `skills.json` — 60 навыков и требования 8 ролей × 4 грейда;
+  - `activity_history.csv` — 2 743 записи за 24 месяца.
+- **Проверочные профили** загружаются через HR → «Данные» в той же схеме. Каталог и требования берутся из исходного набора. Тип файла определяется по содержимому. Ошибки выводятся с путём в JSON или строкой CSV.
+- **OpenAI API** — выбор шагов и текст объяснения. Отправляется только минимизированный контекст: роль и грейд, цель, разрывы, кандидаты и факты. Имя, ID, руководитель и полная история не отправляются.
+- **Vercel** — хостинг. **Google Fonts** — шрифты интерфейса.
+- Реальных персональных данных нет.
+
+## 9. Ограничения
+
+- **Авторизация демо-уровня.** Роль (сотрудник или HR) выбирается на экране входа, сервер проверяет права по ней. Настоящих учётных записей и паролей нет.
+- **Состояние хранится в браузере.** Отметки и проверочный сценарий видны только в этом браузере; на другом устройстве открывается чистый исходный набор.
+- **Даты маршрута — оценка последовательности,** а не бронирование: self-paced — 4 ч/день, очные — ceil(ч/8) дней. Готовность и маршрут не являются прогнозом повышения.
+- **Серверная проверка AI ловит не всё.** Она ловит выдуманные активности, нарушение приоритета, мало факторов и числа, которых нет в фактах. Смысловые неточности в тексте (например, неверную характеристику навыка) ловит не полностью, поэтому рядом всегда показаны исходные факты.
+- В датасете нет вместимости и бюджета обучения, поэтому HR не получает выводов о нехватке мест.
+- «Не сейчас» откладывает шаг до ручного возврата, без срока.
+- **Локализация.** RU и EN полные; KK покрывает основные элементы интерфейса, остальное — на русском. Названия активностей — на английском, как в датасете.
+- Нет автоматического CI на GitHub: Actions недоступен в организации хакатона. `.github/workflows/ci.yml` запускается вручную, те же проверки — `npm run check`.

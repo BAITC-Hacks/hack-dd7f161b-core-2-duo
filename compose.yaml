@@ -1,0 +1,11 @@
+services:
+  api:
+    build: { context: ., target: api }
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4.1}
+    ports: ["8000:8000"]
+  web:
+    build: { context: ., target: web }
+    depends_on: [api]
+    ports: ["3000:3000"]
