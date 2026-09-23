@@ -42,7 +42,7 @@ export function SimulationResult({ data, locale, skillName, eventName, compact =
             <span className="node">{i + 1}</span>
             <div className="step-title">{st.title}</div>
             <div className="changes">
-              {st.changes.filter((c) => c.actual > 0).map((c) => `${skillName(c.skill_id)} ${c.before}→${c.after}`).join(", ") || "—"} · {t("readinessDelta")} +
+              {st.changes.filter((c) => c.actual > 0).map((c) => `${skillName(c.skill_id)} ${c.before}→${c.after}`).join(", ") || "-"} · {t("readinessDelta")} +
               {st.readiness_delta_pp.toFixed(1)} {pick({ ru: "п.п.", en: "pp", kk: "п.т." }, locale)}
               {st.new_unlocks.length > 0 && ` · ${t("unlocks")}: ${st.new_unlocks.map(eventName).join(", ")}`}
             </div>

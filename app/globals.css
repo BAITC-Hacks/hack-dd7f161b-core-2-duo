@@ -304,3 +304,6 @@ select.input { appearance: auto; }
 
 /* long uploaded file names must not widen the page on phones */
 .scenario-chip { white-space: normal; max-width: 100%; overflow-wrap: anywhere; }
+
+/* link styled as a button must not wrap into two boxes */
+a.btn { display: inline-block; white-space: nowrap; text-decoration: none; }

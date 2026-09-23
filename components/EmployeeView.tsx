@@ -29,7 +29,7 @@ type Cand = {
 type Snapshot = any;
 type Ai = { ai_status: string; model: string; choices: { event_id: string; evidence_ids: string[]; reason_codes: string[]; explanation: string }[]; elapsed_ms: number; fingerprint: string; validation?: string[] };
 
-const pct = (v: number | null | undefined) => (v == null ? "—" : v.toFixed(1));
+const pct = (v: number | null | undefined) => (v == null ? "-" : v.toFixed(1));
 
 export function EmployeeView({ employeeId, meta, section }: { employeeId: string; meta: Meta; section: string }) {
   const s = useAppState();
@@ -182,7 +182,7 @@ function Hero(ctx: Ctx) {
             <select className="input" aria-label={t("target")} disabled={ctx.refreshing} style={{ maxWidth: 320 }} value={goal} onChange={(ev) => setGoal(ev.target.value)}>
               {meta.targets.map((x) => (
                 <option key={x} value={x}>
-                  {x.replace("|", " — ")}
+                  {x.replace("|", ", ")}
                 </option>
               ))}
             </select>
@@ -351,7 +351,7 @@ function RecCard({ ctx, cand, choice, main }: { ctx: Ctx; cand: Cand; choice?: A
       </div>
       <div className="title">{cand.title}</div>
       <div className="small muted">{cand.session ? `${t("session")}: ${cand.session}` : cand.action_kind === "continue" ? t("continue") : t("selfPaced")}</div>
-      {choice?.explanation && <p className="ai-text">{choice.explanation}</p>}
+      {choice?.explanation && <p className="ai-text">{choice.explanation.replace(/\u2014/g, "-")}</p>}
       <ul className="facts">
         {summaryFacts.map((f) => (
           <li key={f.id}>{renderFact(f, s.locale, skill, event, t)}</li>
@@ -426,7 +426,7 @@ function WhyNot({ ctx, cand }: { ctx: Ctx; cand: Cand }) {
           {pick({ ru: "Самый низкий навык цели", en: "Lowest goal skill", kk: "Мақсаттың ең төмен дағдысы" }, s.locale)}: <b>{skill(lowest.skill_id)}</b> ({lowest.current}/{lowest.required}
           {lowest.critical ? ", critical" : ""}). {pick(
             {
-              ru: "Ранжирование учитывает критичность (×2), закрытие разрыва и историю — не только минимальный навык.",
+              ru: "Ранжирование учитывает критичность (×2), закрытие разрыва и историю, а не только минимальный навык.",
               en: "Ranking weighs critical gaps ×2 and history, not just the minimum.",
               kk: "Рейтинг тек ең төмен дағдыны емес, сыни маңыздылықты (×2), алшақтықтың жабылуын және тарихты ескереді.",
             },
@@ -436,12 +436,12 @@ function WhyNot({ ctx, cand }: { ctx: Ctx; cand: Cand }) {
       )}
       {(snap.alternatives_considered as any[]).map((a) => (
         <p key={a.event_id}>
-          <b>{a.title}</b> — {t("tier" + a.tier)}, {a.score} vs {cand.score}; {pick({ ru: "история", en: "history fit", kk: "тарих" }, s.locale)} {a.breakdown.history_fit}
+          <b>{a.title}</b>: {t("tier" + a.tier)}, {a.score} vs {cand.score}; {pick({ ru: "история", en: "history fit", kk: "тарих" }, s.locale)} {a.breakdown.history_fit}
         </p>
       ))}
       {blocked.slice(0, 4).map((c) => (
         <p key={c.event_id}>
-          <b>{c.title}</b> — {c.reasons.map((r: any) => reasonText(r.code, s.locale)).join("; ")}
+          <b>{c.title}</b>: {c.reasons.map((r: any) => reasonText(r.code, s.locale)).join("; ")}
         </p>
       ))}
     </div>
@@ -639,13 +639,13 @@ function SkillRow({ r, name, t }: { r: any; name: string; t: Ctx["t"] }) {
         {name}
         {r.critical && <span className="crit">● {t("critical").toLowerCase()}</span>}
       </div>
-      <div className="ruler" role="img" aria-label={`${name}: ${r.current} / ${r.required ?? "—"}`}>
+      <div className="ruler" role="img" aria-label={`${name}: ${r.current} / ${r.required ?? "-"}`}>
         {cells.map((c, i) => (
           <span key={i} className={`cell ${c}`} />
         ))}
       </div>
       <div className="nums">
-        {t("assessed")} {r.assessed} · {t("calculated")} <b>{r.current}</b> · {t("required")} {r.required ?? "—"}
+        {t("assessed")} {r.assessed} · {t("calculated")} <b>{r.current}</b> · {t("required")} {r.required ?? "-"}
         {r.applications.length > 0 && (
           <button className="btn ghost small" onClick={() => setOpen(!open)} aria-label={`${t("skillSource")}: ${name}`} aria-expanded={open} aria-controls={sourceId}>
             ⓘ
@@ -722,7 +722,7 @@ function Catalog(ctx: Ctx) {
                       {ev.develops_skills.map((d: any) => `${skill(d.skill_id)} +${d.gain} (≤${d.max_level})`).join(", ")}
                     </div>
                   </td>
-                  <td className="small">{c.session ?? (c.format === "self_paced" ? t("selfPaced") : "—")}</td>
+                  <td className="small">{c.session ?? (c.format === "self_paced" ? t("selfPaced") : "-")}</td>
                   <td className="small">
                     {c.eligible ? (
                       <span className="chip">{t("eligible")}</span>

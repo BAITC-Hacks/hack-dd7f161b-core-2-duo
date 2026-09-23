@@ -43888,7 +43888,7 @@
               "TARGET_CRITICAL_GAP",
               "HISTORY_INSUFFICIENT"
             ],
-            "explanation": "Вы — Junior Backend Engineer, ориентир — Middle; у вас есть разрыв в System Design и критический разрыв в API Design. Курс полностью закроет оба разрыва по этим навыкам. Надёжных сведений о ваших предпочтениях по истории участия пока нет."
+            "explanation": "Вы - Junior Backend Engineer, ориентир - Middle; у вас есть разрыв в System Design и критический разрыв в API Design. Курс полностью закроет оба разрыва по этим навыкам. Надёжных сведений о ваших предпочтениях по истории участия пока нет."
           },
           {
             "event_id": "EV_036",
@@ -43905,7 +43905,7 @@
               "TARGET_GAP",
               "HISTORY_INSUFFICIENT"
             ],
-            "explanation": "Вы — Junior Backend Engineer, ориентир — Middle; у вас есть разрыв в Public Speaking. Клуб полностью закроет этот разрыв, но критический разрыв в API Design останется. Надёжных сведений о ваших предпочтениях по истории участия пока нет."
+            "explanation": "Вы - Junior Backend Engineer, ориентир - Middle; у вас есть разрыв в Public Speaking. Клуб полностью закроет этот разрыв, но критический разрыв в API Design останется. Надёжных сведений о ваших предпочтениях по истории участия пока нет."
           }
         ],
         "elapsed_ms": 3599,
@@ -43939,7 +43939,7 @@
               "TARGET_GAP",
               "HISTORY_UNFAVORABLE_FORMAT"
             ],
-            "explanation": "Вы — Lead Backend Engineer, а для целевой роли Data Analyst уровня Lead требуется Public Speaking на уровне 3; ваш текущий уровень — 2. Эта активность закроет разрыв по Public Speaking. Среди офлайн-активностей вы завершили 4 из 6, не пропускали и не бросали встречи; разрыв по Stakeholder Management останется."
+            "explanation": "Вы - Lead Backend Engineer, а для целевой роли Data Analyst уровня Lead требуется Public Speaking на уровне 3; ваш текущий уровень - 2. Эта активность закроет разрыв по Public Speaking. Среди офлайн-активностей вы завершили 4 из 6, не пропускали и не бросали встречи; разрыв по Stakeholder Management останется."
           }
         ],
         "elapsed_ms": 2709,
@@ -43973,7 +43973,7 @@
               "TARGET_CRITICAL_GAP",
               "HISTORY_UNFAVORABLE_FORMAT"
             ],
-            "explanation": "Вы — Product Manager уровня Junior; для целевого уровня Middle требуется Product Discovery на уровне 3, а сейчас разрыв составляет 2. Лаборатория повысит Product Discovery с 1 до 2: разрыв сократится до 1 и останется; Product Discovery и Product Analytics по-прежнему будут критическими пробелами. В истории участия в мастер-классах 2 завершения, 0 пропусков и 3 отказа от участия."
+            "explanation": "Вы - Product Manager уровня Junior; для целевого уровня Middle требуется Product Discovery на уровне 3, а сейчас разрыв составляет 2. Лаборатория повысит Product Discovery с 1 до 2: разрыв сократится до 1 и останется; Product Discovery и Product Analytics по-прежнему будут критическими пробелами. В истории участия в мастер-классах 2 завершения, 0 пропусков и 3 отказа от участия."
           },
           {
             "event_id": "EV_020",
@@ -43987,7 +43987,7 @@
             "reason_codes": [
               "HISTORY_INSUFFICIENT"
             ],
-            "explanation": "Вы — Product Manager уровня Junior; для целевого уровня Middle требуется Product Analytics на уровне 3, а сейчас разрыв составляет 1. Курс повысит Statistics с 0 до 1, но выбранные данные не показывают, как это изменит разрыв в Product Analytics; Product Discovery и Product Analytics останутся критическими пробелами. Надёжных данных о ваших предпочтениях в участии нет."
+            "explanation": "Вы - Product Manager уровня Junior; для целевого уровня Middle требуется Product Analytics на уровне 3, а сейчас разрыв составляет 1. Курс повысит Statistics с 0 до 1, но выбранные данные не показывают, как это изменит разрыв в Product Analytics; Product Discovery и Product Analytics останутся критическими пробелами. Надёжных данных о ваших предпочтениях в участии нет."
           },
           {
             "event_id": "EV_036",
@@ -44003,7 +44003,7 @@
             "reason_codes": [
               "HISTORY_INSUFFICIENT"
             ],
-            "explanation": "Вы — Product Manager уровня Junior; для целевого уровня Middle требуется Product Discovery на уровне 3, а сейчас разрыв составляет 2. Клуб повысит Public Speaking с 1 до 2 и закроет этот навык; Product Discovery и Product Analytics останутся критическими пробелами. Надёжных данных о ваших предпочтениях в участии нет."
+            "explanation": "Вы - Product Manager уровня Junior; для целевого уровня Middle требуется Product Discovery на уровне 3, а сейчас разрыв составляет 2. Клуб повысит Public Speaking с 1 до 2 и закроет этот навык; Product Discovery и Product Analytics останутся критическими пробелами. Надёжных данных о ваших предпочтениях в участии нет."
           }
         ],
         "elapsed_ms": 5502,
@@ -44038,7 +44038,7 @@
               "TARGET_CRITICAL_GAP",
               "HISTORY_INSUFFICIENT"
             ],
-            "explanation": "Вы — Backend Engineer уровня Middle; для целевого уровня Senior по профилю требуется System Design 4, а ваш текущий уровень — 2. Занятие повышает System Design до 3, сокращая разрыв, но он остаётся; Communication повышается до 3 и требование закрывается. Надёжных данных о ваших предпочтениях пока нет."
+            "explanation": "Вы - Backend Engineer уровня Middle; для целевого уровня Senior по профилю требуется System Design 4, а ваш текущий уровень - 2. Занятие повышает System Design до 3, сокращая разрыв, но он остаётся; Communication повышается до 3 и требование закрывается. Надёжных данных о ваших предпочтениях пока нет."
           },
           {
             "event_id": "EV_005",
@@ -44055,7 +44055,7 @@
               "TARGET_CRITICAL_GAP",
               "HISTORY_INSUFFICIENT"
             ],
-            "explanation": "Вы — Backend Engineer уровня Middle; для целевого уровня Senior по профилю требуется System Design 4, а ваш текущий уровень — 2. Курс повышает System Design до 3, сокращая разрыв, но он остаётся. Надёжных данных о ваших предпочтениях пока нет."
+            "explanation": "Вы - Backend Engineer уровня Middle; для целевого уровня Senior по профилю требуется System Design 4, а ваш текущий уровень - 2. Курс повышает System Design до 3, сокращая разрыв, но он остаётся. Надёжных данных о ваших предпочтениях пока нет."
           },
           {
             "event_id": "EV_036",
@@ -44072,7 +44072,7 @@
               "TARGET_GAP",
               "HISTORY_INSUFFICIENT"
             ],
-            "explanation": "Вы — Backend Engineer уровня Middle; для целевого уровня Senior по профилю требуется Public Speaking 2, а ваш текущий уровень — 1. Клуб повышает Public Speaking до 2 и полностью закрывает этот разрыв. Надёжных данных о ваших предпочтениях пока нет."
+            "explanation": "Вы - Backend Engineer уровня Middle; для целевого уровня Senior по профилю требуется Public Speaking 2, а ваш текущий уровень - 1. Клуб повышает Public Speaking до 2 и полностью закрывает этот разрыв. Надёжных данных о ваших предпочтениях пока нет."
           }
         ],
         "elapsed_ms": 5110,
@@ -64598,5 +64598,5 @@
     }
   },
   "finished_utc": "2026-09-23T12:13:23.339269+00:00",
-  "check_scope_ru": "Сопоставление what-if с HTTP-снимком ограничено отображаемыми навыками: simulate возвращает полный вектор, snapshot.skills — отображаемую часть. Производные проверки пересчитаны из сохранённых ответов; HTTP-ответы и времена не изменены."
+  "check_scope_ru": "Сопоставление what-if с HTTP-снимком ограничено отображаемыми навыками: simulate возвращает полный вектор, snapshot.skills - отображаемую часть. Производные проверки пересчитаны из сохранённых ответов; HTTP-ответы и времена не изменены."
 }

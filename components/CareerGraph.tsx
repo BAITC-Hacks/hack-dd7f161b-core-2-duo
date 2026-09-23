@@ -119,7 +119,7 @@ export function CareerGraph({ graph, locale, skillName }: {
         </svg>
       </div>
       <div className="graph-legend small">
-        {(["requires", "develops", "prerequisite"] as const).map((kind) => <span key={kind}><b>{kind}</b> — {c[kind]}</span>)}
+        {(["requires", "develops", "prerequisite"] as const).map((kind) => <span key={kind}><b>{kind}</b> - {c[kind]}</span>)}
       </div>
     </div>
     <div className="graph-list">
@@ -133,7 +133,7 @@ export function CareerGraph({ graph, locale, skillName }: {
       {nodes.every((n) => n.kind !== "activity") && <p className="small muted">{c.noActivity}</p>}
       <div className="graph-table-wrap"><table>
         <caption>{c.conditions}</caption><thead><tr><th>{c.skill}</th><th>{c.now}</th><th>{t("required")}</th></tr></thead>
-        <tbody>{nodes.filter((n) => n.kind === "skill").map((n) => n.kind === "skill" && <tr key={n.id}><td>{nodeButton(n)}{n.critical && " ★"}</td><td>{n.current}</td><td>{n.required ?? "—"}</td></tr>)}</tbody>
+        <tbody>{nodes.filter((n) => n.kind === "skill").map((n) => n.kind === "skill" && <tr key={n.id}><td>{nodeButton(n)}{n.critical && " ★"}</td><td>{n.current}</td><td>{n.required ?? "-"}</td></tr>)}</tbody>
       </table></div>
       {nodeButton(graph.nodes.find((n) => n.id === "goal")!)}
     </div>
@@ -143,7 +143,7 @@ export function CareerGraph({ graph, locale, skillName }: {
         <p className="small">{selected.duration_hours} {t("hours")} · {selected.format} · {selected.session ?? t("selfPaced")}</p>
         {selected.reasons.length > 0 && <p className="graph-blockers small">{selected.reasons.map((r) => reasonText(r.code, locale)).join("; ")}</p>}
         <div className="graph-detail-columns">
-          <div><h4>{c.conditions}</h4>{selected.prerequisites.length ? <ul>{selected.prerequisites.map((p) => <li key={p.skill_id}>{skillName(p.skill_id)}: {p.current} / {p.required} — {p.met ? "✓" : `${c.level} ${p.required}`}</li>)}</ul> : <p className="small muted">{c.noConditions}</p>}</div>
+          <div><h4>{c.conditions}</h4>{selected.prerequisites.length ? <ul>{selected.prerequisites.map((p) => <li key={p.skill_id}>{skillName(p.skill_id)}: {p.current} / {p.required} - {p.met ? "✓" : `${c.level} ${p.required}`}</li>)}</ul> : <p className="small muted">{c.noConditions}</p>}</div>
           <div><h4>{c.effects}</h4><ul>{selected.effects.map((e) => <li key={e.skill_id}>{skillName(e.skill_id)}: {e.before} → {e.after} (+{e.actual}; {c.cap} {e.cap})</li>)}</ul></div>
         </div>
         {selected.plan_step && <p className="small graph-forecast"><b>{c.forecast} · {c.step} {selected.step}</b>: {selected.plan_step.estimated_start} → {selected.plan_step.estimated_finish}<br />{selected.plan_step.changes.map((e) => `${skillName(e.skill_id)}: ${e.before} → ${e.after}`).join(" · ")}</p>}
