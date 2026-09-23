@@ -15,10 +15,11 @@ from fastapi import (  # noqa: E402
     Response,
     UploadFile,
 )
-from pydantic import BaseModel, Field  # noqa: E402
+from pydantic import BaseModel, Field, field_validator  # noqa: E402
 
 from career_quest.ai import active_model, select_actions  # noqa: E402
 from career_quest.auth import Principal, SessionStore, SignedTokenStore  # noqa: E402
+from career_quest.chat import ChatMessage, answer_chat  # noqa: E402
 from career_quest.dataset import (  # noqa: E402
     Dataset,
     ValidationError,
@@ -53,6 +54,18 @@ class StateRequest(BaseModel):
 
 class SimulateRequest(StateRequest):
     steps: list[str]
+
+
+class ChatRequest(StateRequest):
+    message: str = Field(min_length=1, max_length=2000)
+    history: list[ChatMessage] = Field(default_factory=list, max_length=8)
+
+    @field_validator("message")
+    @classmethod
+    def nonblank_message(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("Message must not be blank")
+        return value.strip()
 
 
 class LoginRequest(BaseModel):
@@ -236,6 +249,26 @@ def employee_simulate(
     ds = _dataset(req.overlay)
     _authorize(ds, employee_id, principal)
     return simulate(ds, employee_id, req.overlay.model_dump(), req.steps)
+
+
+@app.post("/api/py/employees/{employee_id}/chat")
+async def employee_chat(
+    employee_id: str,
+    req: ChatRequest,
+    principal: AuthenticatedPrincipal,
+    response: Response,
+) -> dict:
+    ds = _dataset(req.overlay)
+    _authorize(ds, employee_id, principal)
+    response.headers["Cache-Control"] = "no-store"
+    return await answer_chat(
+        ds,
+        employee_id,
+        req.overlay.model_dump(),
+        req.message,
+        [m.model_dump() for m in req.history],
+        req.locale,
+    )
 
 
 @app.post("/api/py/hr/dashboard")
