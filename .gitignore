@@ -1,0 +1,41 @@
+# ai assistant: skills, configs, instructions
+.claude/
+.agents/
+skills-lock.json
+CLAUDE.md
+CLAUDE.local.md
+AGENTS.md
+GEMINI.md
+.mcp.json
+.cursor/
+.cursorrules
+.cursorignore
+.windsurf/
+.windsurfrules
+.gemini/
+.codex/
+.continue/
+.aider*
+.github/copilot-instructions.md
+
+# secrets
+.env
+.env.*
+!.env.example
+
+# python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.ruff_cache/
+dist/
+*.egg-info/
+.venv/
+
+# os / editors
+.DS_Store
+.idea/
+.vscode/
+
+project-tz/
