@@ -1,0 +1,59 @@
+{
+  "meta": {
+    "dataset": "Синтетические сценарии оценки Career Quest",
+    "version": "1.0",
+    "as_of_date": "2026-10-01"
+  },
+  "events": [
+    {
+      "event_id": "EV_TARGET_BLOCKED",
+      "title": "Целевой курс проектирования решений",
+      "description": "Целевой курс проектирования решений. Синтетическая активность для воспроизводимой оценки.",
+      "type": "course",
+      "format": "self_paced",
+      "duration_hours": 8,
+      "mandatory": false,
+      "target_roles": [
+        "Инженер учебных примеров"
+      ],
+      "target_grades": [
+        "Junior"
+      ],
+      "develops_skills": [
+        {
+          "skill_id": "SK_TARGET",
+          "gain": 1,
+          "max_level": 3
+        }
+      ],
+      "prerequisites": {
+        "SK_PREP": 1
+      },
+      "upcoming_sessions": []
+    },
+    {
+      "event_id": "EV_PREPARE",
+      "title": "Подготовительный курс основ",
+      "description": "Подготовительный курс основ. Синтетическая активность для воспроизводимой оценки.",
+      "type": "course",
+      "format": "self_paced",
+      "duration_hours": 8,
+      "mandatory": false,
+      "target_roles": [
+        "Инженер учебных примеров"
+      ],
+      "target_grades": [
+        "Junior"
+      ],
+      "develops_skills": [
+        {
+          "skill_id": "SK_PREP",
+          "gain": 1,
+          "max_level": 3
+        }
+      ],
+      "prerequisites": {},
+      "upcoming_sessions": []
+    }
+  ]
+}

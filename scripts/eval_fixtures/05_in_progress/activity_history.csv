@@ -1,0 +1,2 @@
+record_id,employee_id,event_id,date,due_date,status,completion_pct,score,feedback_rating,assigned_by
+R001,E_SYNTH,EV_ACTIVE,2026-09-20,,in_progress,75,,,self

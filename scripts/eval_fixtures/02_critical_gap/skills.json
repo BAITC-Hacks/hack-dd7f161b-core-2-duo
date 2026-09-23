@@ -1,0 +1,53 @@
+{
+  "meta": {
+    "dataset": "Синтетические сценарии оценки Career Quest",
+    "version": "1.0",
+    "as_of_date": "2026-10-01"
+  },
+  "proficiency_scale": {
+    "0": "Нет знаний",
+    "1": "Начальное знакомство",
+    "2": "Рабочие знания",
+    "3": "Самостоятельное применение",
+    "4": "Продвинутый уровень",
+    "5": "Экспертный уровень"
+  },
+  "skills": [
+    {
+      "skill_id": "SK_OPTIONAL",
+      "name": "Дополнительная коммуникация",
+      "type": "hard",
+      "category": "engineering",
+      "description": "Условный навык: дополнительная коммуникация."
+    },
+    {
+      "skill_id": "SK_CRITICAL",
+      "name": "Надёжность решений",
+      "type": "hard",
+      "category": "engineering",
+      "description": "Условный навык: надёжность решений."
+    }
+  ],
+  "role_profiles": [
+    {
+      "role": "Инженер учебных примеров",
+      "grade": "Junior",
+      "required_skills": {
+        "SK_OPTIONAL": 0,
+        "SK_CRITICAL": 0
+      },
+      "critical_skills": []
+    },
+    {
+      "role": "Инженер учебных примеров",
+      "grade": "Middle",
+      "required_skills": {
+        "SK_OPTIONAL": 1,
+        "SK_CRITICAL": 2
+      },
+      "critical_skills": [
+        "SK_CRITICAL"
+      ]
+    }
+  ]
+}
