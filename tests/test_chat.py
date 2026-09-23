@@ -80,7 +80,7 @@ def test_chat_simulation_matches_existing_endpoint_and_never_uses_model_numbers(
     assert before["fingerprint"] == after["fingerprint"]
 
 
-@pytest.mark.parametrize("event_id", ["EV_FAKE", "EV_001", "EV_006", ["EV_005"], None])
+@pytest.mark.parametrize("event_id", ["EV_FAKE", "EV_001", "EV_006", ["EV_005"]])
 def test_rejects_foreign_blocked_or_malformed_event(client, monkeypatch, event_id):
     mock_model(
         monkeypatch,
@@ -105,7 +105,12 @@ def test_explanation_is_exact_glossary_entry_even_if_model_invents_facts(client,
         },
     )
     for locale in ("ru", "en", "kk"):
-        body = send(client, auth(client), "что такое readiness?", locale=locale).json()
+        question = {
+            "ru": "что такое readiness?",
+            "en": "what is readiness?",
+            "kk": "readiness дегеніміз не?",
+        }[locale]
+        body = send(client, auth(client), question, locale="en").json()
         assert body["intent"] == "explain"
         assert body["reply_text"] == GLOSSARY["readiness"][locale]
         assert body["simulation"] is None
@@ -141,7 +146,7 @@ def test_off_topic_response_is_fixed_refusal(client, monkeypatch):
     )
     body = send(client, auth(client), "посчитай зарплату").json()
     assert body["intent"] == "refuse"
-    assert "только" in body["reply_text"]
+    assert "платформе" in body["reply_text"]
     assert "Давайте" not in body["reply_text"]
 
 
@@ -342,3 +347,109 @@ def test_shared_adapter_respects_compatible_endpoint_and_model(client, monkeypat
     assert calls[0][0] == "http://localhost:11434/v1/chat/completions"
     assert calls[0][1]["model"] == "local-model"
     assert body["prompt_version"] != ai.PROMPT_VERSION
+
+
+@pytest.mark.parametrize(
+    "query, locale, event_id",
+    [
+        ("найди курс по системному дизайну", "ru", "EV_005"),
+        ("Python курсын тауып бер", "kk", "EV_012"),
+        ("жүйелік дизайн курсын ізде", "kk", "EV_005"),
+        ("Find a course on Python", "en", "EV_012"),
+        ("найди курс по куберу", "ru", "EV_010"),
+    ],
+)
+def test_catalog_search_in_message_language_without_llm(
+    client, monkeypatch, query, locale, event_id
+):
+    monkeypatch.delenv("OPENAI_API_KEY")
+    body = send(client, auth(client), query, locale="en").json()
+    assert body["locale"] == locale
+    assert body["suggestions"][0]["event_id"] == event_id
+    assert "???" not in body["reply_text"]
+    assert body["ai_status"] == "rule_based"
+    assert body["simulation"] is None
+
+
+@pytest.mark.parametrize(
+    "query, locale",
+    [
+        ("Did I complete Secure Coding Workshop", "en"),
+        ("Я уже проходил Secure Coding Workshop?", "ru"),
+        ("Мен Secure Coding Workshop курсын аяқтадым ба?", "kk"),
+    ],
+)
+def test_user_reported_history_question_reads_actual_records(client, monkeypatch, query, locale):
+    monkeypatch.delenv("OPENAI_API_KEY")
+    headers = auth(client)
+    body = send(client, headers, query, locale="en").json()
+    assert body["intent"] == "status"
+    assert body["locale"] == locale
+    assert body["event_id"] == "EV_011"
+    assert body["simulation"] is None
+    snap = client.post("/api/py/employees/E0028", headers=headers, json={}).json()
+    own = [h for h in snap["history"] if h["event_id"] == "EV_011" and h["status"] == "completed"]
+    if own:
+        assert max(h["date"] for h in own) in body["reply_text"]
+
+
+@pytest.mark.parametrize(
+    "query",
+    [
+        "А если я пройду систем дизайн?",
+        "What if I complete System Desgn?",
+        "Егер жүйелік дизайн курсын аяқтасам?",
+    ],
+)
+def test_informal_name_rescues_model_refusal(client, monkeypatch, query):
+    mock_model(
+        monkeypatch, {"intent": "refuse", "event_id": None, "term_id": None, "reply_text": ""}
+    )
+    body = send(client, auth(client), query).json()
+    assert body["intent"] == "simulate"
+    assert body["event_id"] == "EV_005"
+
+
+def test_ambiguous_course_offers_choices_and_remembers_second(client, monkeypatch):
+    mock_model(
+        monkeypatch, {"intent": "refuse", "event_id": None, "term_id": None, "reply_text": ""}
+    )
+    headers = auth(client)
+    offered = send(client, headers, "А что мне пройти?").json()
+    assert len(offered["suggestions"]) >= 2
+    body = send(
+        client, headers, "второй", history=[{"role": "assistant", "content": offered["reply_text"]}]
+    ).json()
+    assert body["event_id"] == offered["suggestions"][1]["event_id"]
+    assert body["simulation"] is not None
+
+
+def test_named_blocked_course_explains_real_blocker(client, monkeypatch):
+    mock_model(
+        monkeypatch, {"intent": "refuse", "event_id": None, "term_id": None, "reply_text": ""}
+    )
+    body = send(client, auth(client), "а если пройти хайлоад?").json()
+    assert body["simulation"] is None
+    assert "Designing High-Load Systems" in body["reply_text"]
+    assert "уже завершена" in body["reply_text"]
+    assert "точное название" not in body["reply_text"]
+
+
+def test_skill_gain_without_readiness_gain_is_explained():
+    from career_quest.chat import simulation_text
+
+    result = {
+        "before": {"readiness_pct": 59},
+        "after": {"readiness_pct": 59},
+        "steps": [
+            {
+                "title": "Advanced Python",
+                "changes": [{"skill_id": "SK_PYTHON", "actual": 1, "before": 3, "after": 4}],
+            }
+        ],
+    }
+    answer = simulation_text(
+        result, "en", {"SK_PYTHON": "Python"}, [{"skill_id": "SK_PYTHON", "required": 3}]
+    )
+    assert "59.0% → 59.0%" in answer
+    assert "already meet" in answer

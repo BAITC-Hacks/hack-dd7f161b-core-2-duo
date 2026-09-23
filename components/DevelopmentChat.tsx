@@ -14,6 +14,8 @@ type Message = {
   fingerprint: string;
   simulation?: SimulationData | null;
   unavailable?: boolean;
+  suggestions?: ChatResponse["suggestions"];
+  locale?: ChatResponse["locale"];
 };
 
 export function DevelopmentChat({ s, employeeId, meta, fingerprint, suggestedTitle }: {
@@ -68,9 +70,9 @@ export function DevelopmentChat({ s, employeeId, meta, fingerprint, suggestedTit
     input.current?.focus();
   }
 
-  async function send(e: FormEvent) {
-    e.preventDefault();
-    const message = draft.trim();
+  async function send(e: FormEvent | string) {
+    if (typeof e !== "string") e.preventDefault();
+    const message = (typeof e === "string" ? e : draft).trim();
     if (!message || request.current) return;
     const controller = new AbortController();
     request.current = controller;
@@ -82,15 +84,15 @@ export function DevelopmentChat({ s, employeeId, meta, fingerprint, suggestedTit
     setPending(true);
     // A client deadline also covers a stalled proxy or disconnected server.
     const timer = setTimeout(() => controller.abort(), 10_000);
-    const append = (content: string, simulation?: SimulationData | null, unavailable = false) => {
+    const append = (content: string, simulation?: SimulationData | null, unavailable = false, suggestions?: ChatResponse["suggestions"], locale?: ChatResponse["locale"]) => {
       if (request.current !== controller) return;
-      const reply: Message = { id: ++sequence.current, role: "assistant", content, simulation, fingerprint, unavailable };
+      const reply: Message = { id: ++sequence.current, role: "assistant", content, simulation, fingerprint, unavailable, suggestions, locale };
       setMessages((previous) => [...previous.slice(-39), reply]);
     };
     try {
       const result = await post<ChatResponse>(s, `/employees/${employeeId}/chat`, { message, history }, controller.signal);
       if (!result.reply_text?.trim()) throw new Error("empty_chat_response");
-      append(result.reply_text, result.simulation, result.ai_status.startsWith("fallback_"));
+      append(result.reply_text, result.simulation, result.ai_status.startsWith("fallback_"), result.suggestions, result.locale);
     } catch {
       append(copy.unavailable, null, true);
     } finally {
@@ -125,7 +127,11 @@ export function DevelopmentChat({ s, employeeId, meta, fingerprint, suggestedTit
                 {m.simulation && m.fingerprint !== fingerprint ? <p>{copy.stale}</p> : (
                   <>
                     <p>{m.content}</p>
-                    {m.simulation && <SimulationResult compact data={m.simulation} locale={s.locale}
+                    {!!m.suggestions?.length && m.fingerprint === fingerprint && <div className="chat-suggestions" style={{ marginTop: 10 }}>
+                      {m.suggestions.map((c) => <button key={c.event_id} type="button" className="btn small" disabled={pending}
+                        onClick={() => void send(CHAT_COPY[m.locale ?? s.locale].scenario.replace("{title}", c.title))}>{c.title}</button>)}
+                    </div>}
+                    {m.simulation && <SimulationResult compact data={m.simulation} locale={m.locale ?? s.locale}
                       skillName={(id) => meta.skills[id]?.name ?? id} eventName={(id) => meta.events[id]?.title ?? id} />}
                   </>
                 )}

@@ -1,16 +1,18 @@
 import type { SimulationData } from "@/components/SimulationResult";
 
 export type ChatResponse = {
-  intent: "simulate" | "explain" | "refuse";
+  intent: "simulate" | "explain" | "status" | "refuse";
   reply_text: string;
   simulation: SimulationData | null;
   ai_status: string;
+  suggestions?: { event_id: string; title: string }[];
+  locale?: "ru" | "kk" | "en";
 };
 
 export const CHAT_COPY = {
   ru: {
     title: "Спроси о развитии", subtitle: "Прогноз шага или объяснение термина",
-    intro: "Могу показать, что изменится после одной доступной активности, или объяснить термин платформы. Это прогноз - отметки о выполнении не меняются.",
+    intro: "Спросите, проходили ли вы курс, что изменится после обучения или что означает термин. Можно писать своими словами и выбирать предложенные варианты.",
     placeholder: "Что такое readiness? Или: а если я пройду…",
     label: "Ваш вопрос о развитии", send: "Отправить", close: "Закрыть чат", clear: "Очистить",
     glossary: "Что такое readiness?", scenario: "А что если я пройду {title}?", scenarioButton: "Прогноз: {title}",
@@ -21,7 +23,7 @@ export const CHAT_COPY = {
   },
   en: {
     title: "Ask about development", subtitle: "Project a step or understand a term",
-    intro: "I can project the effect of one available activity or explain a platform term. Projections do not mark activities complete.",
+    intro: "Ask whether you completed a course, what would change after learning, or what a platform term means. Use your own words or select a suggested option.",
     placeholder: "What is readiness? Or: what if I complete…",
     label: "Your development question", send: "Send", close: "Close chat", clear: "Clear",
     glossary: "What is readiness?", scenario: "What if I complete {title}?", scenarioButton: "Project: {title}",
@@ -32,7 +34,7 @@ export const CHAT_COPY = {
   },
   kk: {
     title: "Даму туралы сұра", subtitle: "Қадам болжамы немесе термин түсіндірмесі",
-    intro: "Бір қолжетімді белсенділіктен кейін не өзгеретінін көрсете аламын немесе платформа терминін түсіндіремін. Болжам аяқталу белгілерін өзгертпейді.",
+    intro: "Курсты аяқтағаныңызды, оқудан кейін не өзгеретінін немесе термин мағынасын сұраңыз. Өз сөзіңізбен жазыңыз немесе ұсынылған нұсқаны таңдаңыз.",
     placeholder: "Readiness деген не? Немесе: егер мен…",
     label: "Даму туралы сұрағыңыз", send: "Жіберу", close: "Чатты жабу", clear: "Тазарту",
     glossary: "Readiness деген не?", scenario: "Егер мен {title} аяқтасам не өзгереді?", scenarioButton: "Болжам: {title}",
