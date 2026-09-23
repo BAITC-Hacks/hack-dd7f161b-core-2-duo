@@ -40,7 +40,9 @@ function SkillsSection({ data, meta }: { data: any; meta: Meta }) {
   const s = useAppState();
   const t = translator(s.locale);
   const [open, setOpen] = useState<string | null>(null);
+  const [all, setAll] = useState(false);
   const L = s.locale === "en" ? "en" : "ru";
+  const rows = all ? data.skills : data.skills.slice(0, 15);
   return (
     <section className="panel">
       <div className="section-head">
@@ -61,7 +63,7 @@ function SkillsSection({ data, meta }: { data: any; meta: Meta }) {
             </tr>
           </thead>
           <tbody>
-            {data.skills.map((k: any) => {
+            {rows.map((k: any) => {
               const tot = k.actionable_employee_count + k.bridge_employee_count + k.uncovered_employee_count || 1;
               return (
                 <Fragment key={k.skill_id}>
@@ -123,6 +125,11 @@ function SkillsSection({ data, meta }: { data: any; meta: Meta }) {
           </tbody>
         </table>
       </div>
+      {data.skills.length > 15 && (
+        <button className="btn small" style={{ marginTop: 12 }} onClick={() => setAll(!all)}>
+          {all ? (L === "en" ? "Show top 15" : "Показать первые 15") : L === "en" ? `Show all ${data.skills.length}` : `Показать все ${data.skills.length}`}
+        </button>
+      )}
     </section>
   );
 }

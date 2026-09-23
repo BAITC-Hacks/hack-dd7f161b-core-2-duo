@@ -6,7 +6,7 @@ import { EmployeeView } from "@/components/EmployeeView";
 import { SideNav, Topbar } from "@/components/Shell";
 import { Meta, useApi } from "@/lib/hooks";
 import { translator } from "@/lib/i18n";
-import { useAppState } from "@/lib/store";
+import { getState, useAppState, useHydrated } from "@/lib/store";
 
 export default function MePage() {
   const s = useAppState();
@@ -15,9 +15,11 @@ export default function MePage() {
   const [section, setSection] = useState("path");
   const { data: meta } = useApi<Meta>(s, "/meta");
   const actor = s.session?.role === "employee" ? s.session.actor : undefined;
+  const hydrated = useHydrated();
+  // read storage directly: the first client render still carries the server snapshot
   useEffect(() => {
-    if (s.session === null) router.replace("/");
-  }, [s.session, router]);
+    if (hydrated && getState().session === null) router.replace("/");
+  }, [hydrated, s.session, router]);
   const me = meta?.employees.find((e) => e.employee_id === actor);
   return (
     <>

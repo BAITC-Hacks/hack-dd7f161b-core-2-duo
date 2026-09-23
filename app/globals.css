@@ -60,6 +60,7 @@ p { margin: 0; }
 .btn:disabled { opacity: .5; cursor: default; }
 
 .layout { display: grid; grid-template-columns: 220px 1fr; min-height: calc(100vh - 57px); }
+.layout > * { min-width: 0; }
 .sidenav { border-right: 1px solid var(--line); padding: 20px 12px; display: flex; flex-direction: column; gap: 2px; }
 .sidenav button { text-align: left; border: 0; background: transparent; padding: 9px 12px; border-radius: 10px; color: var(--ink-2); font-size: 14.5px; }
 .sidenav button[aria-current="page"] { background: var(--surface); color: var(--ink); box-shadow: 0 0 0 1px var(--line); font-weight: 500; }
@@ -97,7 +98,7 @@ p { margin: 0; }
 .bar > .ghost { position: absolute; top: 0; left: 0; background: repeating-linear-gradient(45deg, rgba(14,124,90,.35) 0 4px, transparent 4px 8px); }
 
 /* ---- recommendation cards ---- */
-.recs { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; }
+.recs { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; align-items: start; }
 .recs .alts { display: flex; flex-direction: column; gap: 16px; }
 @media (max-width: 960px) { .recs { grid-template-columns: 1fr; } }
 .rec { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 20px; display: flex; flex-direction: column; gap: 12px; }
@@ -135,7 +136,7 @@ p { margin: 0; }
 
 /* ---- skill ruler (the signature element) ---- */
 .skills { display: flex; flex-direction: column; }
-.skill { display: grid; grid-template-columns: minmax(150px, 1.1fr) 2fr auto; gap: 16px; align-items: center; padding: 10px 0; border-bottom: 1px solid #edf1ef; }
+.skill { display: grid; grid-template-columns: minmax(150px, 1.1fr) 2fr 210px; gap: 16px; align-items: center; padding: 10px 0; border-bottom: 1px solid #edf1ef; }
 .skill:last-child { border-bottom: 0; }
 .skill .name { font-size: 14.5px; }
 .skill .name .crit { color: var(--amber); font-size: 12px; margin-left: 6px; }
@@ -145,7 +146,7 @@ p { margin: 0; }
 .ruler .cell.gained { background: repeating-linear-gradient(45deg, var(--green) 0 5px, #4fa887 5px 10px); }
 .ruler .cell.need { box-shadow: inset 0 0 0 2px var(--amber); background: var(--amber-soft); }
 .ruler .req { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--ink); border-radius: 2px; }
-.skill .nums { font-size: 12.5px; color: var(--ink-3); white-space: nowrap; min-width: 150px; text-align: right; }
+.skill .nums { font-size: 12.5px; color: var(--ink-3); white-space: nowrap; text-align: right; }
 .skill .nums b { color: var(--ink); font-weight: 600; }
 .skill .src { grid-column: 1 / -1; font-size: 12.5px; color: var(--ink-2); background: var(--paper); border-radius: 8px; padding: 6px 10px; }
 @media (max-width: 640px) {
