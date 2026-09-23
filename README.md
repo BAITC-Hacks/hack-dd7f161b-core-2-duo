@@ -23,7 +23,10 @@ Tests:
 ```bash
 uv run pytest -q            # calculation core, AI response validation, full dataset
 npm run build               # typecheck + frontend build
+npm run check               # all at once: ruff format/lint + pytest + next build
 ```
+
+CI: `.github/workflows/ci.yml` runs the same steps. It's triggered manually (`workflow_dispatch`), because GitHub Actions is unavailable in the hackathon organization. Before merging, run `npm run check` locally.
 
 ### Vercel deployment
 
