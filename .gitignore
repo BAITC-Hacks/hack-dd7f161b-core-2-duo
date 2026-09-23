@@ -44,10 +44,8 @@ node_modules/
 .next/
 next-env.d.ts
 *.tsbuildinfo
+.vercel
+
+# playwright
 test-results/
 playwright-report/
-<<<<<<< HEAD
-.vercel
-=======
-.vercel
->>>>>>> 11797e00d9afe05d03e56d5b6a5fa15e06627953

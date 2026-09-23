@@ -2,6 +2,7 @@ import hashlib
 import json
 import math
 import time
+from dataclasses import asdict
 from datetime import date, timedelta
 
 from career_quest.dataset import REPEATABLE_EVENTS, Dataset, Event, Record
@@ -17,12 +18,56 @@ XP_PER_COMPLETION = 20
 # ---------- state assembly ----------
 
 
-def employee_records(ds: Dataset, employee_id: str, overlay: dict) -> list[Record]:
-    records = ds.history_of(employee_id)
-    for i, c in enumerate(overlay.get("completions") or []):
-        if c.get("employee_id") != employee_id or c.get("event_id") not in ds.events:
+def effective_completions(ds: Dataset, employee_id: str, overlay: dict) -> list[dict]:
+    # first completion wins, including completions already present in source history
+    if employee_id not in ds.employees:
+        return []
+    seen = {
+        (
+            r.event_id,
+            (r.session_date or r.date).isoformat() if r.event_id in REPEATABLE_EVENTS else None,
+        )
+        for r in ds.history_of(employee_id)
+        if r.status == "completed"
+    }
+    completions = overlay.get("completions") or []
+    if not isinstance(completions, list):
+        return []
+    accepted = []
+    for c in completions:
+        if not isinstance(c, dict) or c.get("employee_id") != employee_id:
+            continue
+        event_id = c.get("event_id")
+        if not isinstance(event_id, str) or event_id not in ds.events:
             continue
         session = c.get("session_date")
+        if session not in (None, ""):
+            try:
+                session = date.fromisoformat(session).isoformat()
+            except (TypeError, ValueError):
+                continue
+        else:
+            session = None
+        if event_id in REPEATABLE_EVENTS and session is None:
+            continue
+        key = (event_id, session if event_id in REPEATABLE_EVENTS else None)
+        if key in seen:
+            continue
+        seen.add(key)
+        accepted.append(
+            {
+                "employee_id": employee_id,
+                "event_id": event_id,
+                "session_date": session,
+                "gaming": c.get("gaming") is True,
+            }
+        )
+    return accepted
+
+
+def employee_records(ds: Dataset, employee_id: str, overlay: dict) -> list[Record]:
+    records = ds.history_of(employee_id)
+    for i, c in enumerate(effective_completions(ds, employee_id, overlay)):
         records.append(
             Record(
                 record_id=f"APP-{i + 1:04d}",
@@ -36,7 +81,7 @@ def employee_records(ds: Dataset, employee_id: str, overlay: dict) -> list[Recor
                 feedback_rating=None,
                 assigned_by="self",
                 origin="app",
-                session_date=date.fromisoformat(session) if session else None,
+                session_date=date.fromisoformat(c["session_date"]) if c["session_date"] else None,
             )
         )
     return records
@@ -44,13 +89,21 @@ def employee_records(ds: Dataset, employee_id: str, overlay: dict) -> list[Recor
 
 def fingerprint(ds: Dataset, employee_id: str, overlay: dict, target: dict) -> str:
     mine = {
-        "c": [c for c in overlay.get("completions") or [] if c.get("employee_id") == employee_id],
+        "c": effective_completions(ds, employee_id, overlay),
         "g": (overlay.get("goals") or {}).get(employee_id),
         "s": (overlay.get("snoozes") or {}).get(employee_id),
         "h": (overlay.get("history_off") or {}).get(employee_id),
     }
     raw = json.dumps(
-        [ds.name, employee_id, ds.as_of.isoformat(), POLICY_VERSION, target, mine],
+        [
+            ds.name,
+            ds.employees[employee_id],
+            [asdict(r) for r in ds.history_of(employee_id)],
+            ds.as_of.isoformat(),
+            POLICY_VERSION,
+            target,
+            mine,
+        ],
         sort_keys=True,
         default=str,
     )
@@ -64,9 +117,26 @@ def audience_ok(event: Event, employee: dict) -> bool:
     return employee["role"] in event.target_roles and employee["grade"] in event.target_grades
 
 
-def next_session(event: Event, available_from: date, horizon_end: date | None) -> date | None:
+def completed_sessions(records: list[Record]) -> set[tuple[str, date]]:
+    return {
+        (r.event_id, r.session_date or r.date)
+        for r in records
+        if r.status == "completed" and r.event_id in REPEATABLE_EVENTS
+    }
+
+
+def next_session(
+    event: Event,
+    available_from: date,
+    horizon_end: date | None,
+    used_sessions: set[tuple[str, date]] | None = None,
+) -> date | None:
     for s in event.upcoming_sessions:
-        if s >= available_from and (horizon_end is None or s <= horizon_end):
+        if (
+            s >= available_from
+            and (horizon_end is None or s <= horizon_end)
+            and (event.event_id, s) not in (used_sessions or set())
+        ):
             return s
     return None
 
@@ -80,6 +150,7 @@ def check_eligibility(
     active: set[str],
     snoozed: set[str],
     available_from: date | None = None,
+    used_sessions: set[tuple[str, date]] | None = None,
 ) -> dict:
     reasons = []
     if event.mandatory:
@@ -109,7 +180,7 @@ def check_eligibility(
         reasons.append({"code": "ACTIVE_ACTIVITY_ALREADY_SELECTED"})
     session = None
     if event.scheduled:
-        session = next_session(event, available_from or ds.as_of, None)
+        session = next_session(event, available_from or ds.as_of, None, used_sessions)
         if session is None:
             reasons.append({"code": "NO_UPCOMING_SESSION"})
     if event.event_id in snoozed:
@@ -154,6 +225,7 @@ def plan_paths(
     completed: set[str],
     active: dict[str, Record],
     snoozed: set[str],
+    used_sessions: set[tuple[str, date]] | None = None,
 ) -> dict:
     t0 = time.perf_counter()
     gaps0 = calculate_gaps(skills, required, critical)
@@ -186,7 +258,7 @@ def plan_paths(
             if any(state["skills"].get(s, 0) < lvl for s, lvl in ev.prerequisites.items()):
                 continue
             if ev.scheduled:
-                sess = next_session(ev, state["avail"], horizon_end)
+                sess = next_session(ev, state["avail"], horizon_end, used_sessions)
                 if sess is None:
                     continue
                 options.append((ev, "start", sess, sess, _finish(ev, sess)))
@@ -584,6 +656,7 @@ def skill_blockers(ds: Dataset, g: dict, catalog: list[dict]) -> list[dict]:
 def build_snapshot(ds: Dataset, employee_id: str, overlay: dict, with_plan: bool = True) -> dict:
     employee = ds.employees[employee_id]
     records = employee_records(ds, employee_id, overlay)
+    used_sessions = completed_sessions(records)
     rp = replay(ds, employee, records)
     skills = rp["current"]
     goal_override = (overlay.get("goals") or {}).get(employee_id)
@@ -605,7 +678,9 @@ def build_snapshot(ds: Dataset, employee_id: str, overlay: dict, with_plan: bool
 
     catalog = []
     for ev in ds.events.values():
-        st = check_eligibility(ds, ev, employee, skills, completed, set(active), snoozed)
+        st = check_eligibility(
+            ds, ev, employee, skills, completed, set(active), snoozed, used_sessions=used_sessions
+        )
         catalog.append(
             {
                 **_event_brief(ev),
@@ -615,7 +690,9 @@ def build_snapshot(ds: Dataset, employee_id: str, overlay: dict, with_plan: bool
         )
 
     plan = (
-        plan_paths(ds, employee, skills, required, critical, completed, active, snoozed)
+        plan_paths(
+            ds, employee, skills, required, critical, completed, active, snoozed, used_sessions
+        )
         if with_plan and not rd["all_requirements_met"]
         else {
             "status": "not_run",
@@ -673,7 +750,10 @@ def build_snapshot(ds: Dataset, employee_id: str, overlay: dict, with_plan: bool
     for g in gap_open:
         direct = [c["event_id"] for c in candidates if g["skill_id"] in c["useful"]]
         bridge = [
-            c["event_id"] for c in candidates if c["bridge"] and g["skill_id"] not in c["useful"]
+            c["event_id"]
+            for c in candidates
+            if c["bridge"]
+            and (c["path"] or {}).get("skills_after", {}).get(g["skill_id"], 0) > g["current"]
         ]
         blockers = [] if direct else skill_blockers(ds, g, catalog)
         status = "actionable" if direct else ("bridge" if bridge else "uncovered")
@@ -804,8 +884,10 @@ def gamification_state(
     xp = 0
     claims = 0
     critical_closed = []
-    app_flags = [c for c in overlay.get("completions") or [] if c.get("employee_id") == employee_id]
-    app_iter = iter(app_flags)
+    app_flags = {
+        f"APP-{i + 1:04d}": c["gaming"]
+        for i, c in enumerate(effective_completions(ds, employee_id, overlay))
+    }
     for r in sorted(
         (r for r in records if r.status == "completed" and review < r.date <= ds.as_of),
         key=lambda r: (r.date, r.origin != "source", r.record_id),
@@ -815,8 +897,11 @@ def gamification_state(
         skills, changes = apply_activity(skills, ev)
         if r.origin != "app":
             continue
-        flag = next(app_iter, {})
-        if not flag.get("gaming") or ev.mandatory or not any(c["actual"] > 0 for c in changes):
+        if (
+            not app_flags.get(r.record_id)
+            or ev.mandatory
+            or not any(c["actual"] > 0 for c in changes)
+        ):
             continue
         xp += XP_PER_COMPLETION
         claims += 1
@@ -853,6 +938,7 @@ def gamification_state(
 def simulate(ds: Dataset, employee_id: str, overlay: dict, steps: list[str]) -> dict:
     employee = ds.employees[employee_id]
     records = employee_records(ds, employee_id, overlay)
+    used_sessions = completed_sessions(records)
     skills = replay(ds, employee, records)["current"]
     target = resolve_target(ds, employee, (overlay.get("goals") or {}).get(employee_id))
     required, critical = target_requirements(ds, target)
@@ -869,7 +955,9 @@ def simulate(ds: Dataset, employee_id: str, overlay: dict, steps: list[str]) -> 
         return {
             ev.event_id
             for ev in ds.events.values()
-            if check_eligibility(ds, ev, employee, sk, used_ids, set(), set())["eligible"]
+            if check_eligibility(
+                ds, ev, employee, sk, used_ids, set(), set(), used_sessions=used_sessions
+            )["eligible"]
         }
 
     for eid in steps[:4]:
@@ -878,7 +966,7 @@ def simulate(ds: Dataset, employee_id: str, overlay: dict, steps: list[str]) -> 
             return {"error": {"code": "UNKNOWN_EVENT", "event_id": eid}}
         is_continue = eid in active and not out_steps
         if not is_continue:
-            st = check_eligibility(ds, ev, employee, cur, used, set(), set(), avail)
+            st = check_eligibility(ds, ev, employee, cur, used, set(), set(), avail, used_sessions)
             if not st["eligible"]:
                 return {
                     "error": {"code": "STEP_BLOCKED", "event_id": eid, "reasons": st["reasons"]}
@@ -890,6 +978,8 @@ def simulate(ds: Dataset, employee_id: str, overlay: dict, steps: list[str]) -> 
         rd_before = readiness(calculate_gaps(cur, required, critical))
         cur, changes = apply_activity(cur, ev)
         used = used | {eid}
+        if eid in REPEATABLE_EVENTS and not is_continue:
+            used_sessions.add((eid, start))
         rd_after = readiness(calculate_gaps(cur, required, critical))
         finish = _finish(ev, start)
         avail = finish

@@ -7,6 +7,13 @@ import time
 import httpx
 
 PROMPT_VERSION = "cq-select-v3"
+DEFAULT_MODEL = "gpt-6-luna"
+
+
+def active_model() -> str:
+    return os.getenv("OPENAI_MODEL", DEFAULT_MODEL)
+
+
 LANG_NAME = {"ru": "Russian", "kk": "Kazakh", "en": "English"}
 
 REASON_CODES = [
@@ -240,7 +247,7 @@ def validate_selection(raw: dict, candidates: list[dict]) -> tuple[list[dict], l
 async def select_actions(snapshot: dict, skill_names: dict[str, str], locale: str) -> dict:
     """Ask the LLM to pick 1-3 steps from the deterministic shortlist, then validate."""
     t0 = time.perf_counter()
-    model = os.getenv("OPENAI_MODEL", "gpt-6-luna")
+    model = active_model()
     base = {"provider": "openai", "model": model, "prompt_version": PROMPT_VERSION}
     candidates = snapshot.get("shortlist") or []
     if not candidates:

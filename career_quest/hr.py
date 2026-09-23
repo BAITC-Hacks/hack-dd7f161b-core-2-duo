@@ -1,7 +1,7 @@
 from collections import Counter, defaultdict
 
 from career_quest.dataset import Dataset
-from career_quest.engine import HR_CODE, PROOF, build_snapshot
+from career_quest.engine import HR_CODE, PROOF, build_snapshot, employee_records
 
 INTERVENTION = {
     "NO_SKILL_PROVIDER": "create_learning_activity",
@@ -135,7 +135,12 @@ def hr_dashboard(ds: Dataset, overlay: dict) -> dict:
 
 def participation(ds: Dataset, overlay: dict) -> list[dict]:
     rows: dict[str, dict] = {}
-    for r in ds.history:
+    records = (
+        record
+        for employee_id in ds.employees
+        for record in employee_records(ds, employee_id, overlay)
+    )
+    for r in records:
         ev = ds.events.get(r.event_id)
         if not ev:
             continue
@@ -153,12 +158,11 @@ def participation(ds: Dataset, overlay: dict) -> list[dict]:
             },
         )
         row["counts"][r.status] += 1
+        if r.origin == "app" and r.status == "completed":
+            row["counts"]["app_completed"] += 1
         row["employees"].add(r.employee_id)
         if r.feedback_rating is not None:
             row["feedback"].append(r.feedback_rating)
-    for c in overlay.get("completions") or []:
-        if c.get("event_id") in rows and c.get("employee_id") in ds.employees:
-            rows[c["event_id"]]["counts"]["app_completed"] += 1
     out = []
     for row in rows.values():
         c = row["counts"]
@@ -168,7 +172,8 @@ def participation(ds: Dataset, overlay: dict) -> list[dict]:
                 **{k: row[k] for k in ("event_id", "title", "type", "format", "mandatory")},
                 "counts": dict(c),
                 "unique_employees": len(row["employees"]),
-                "observations": sum(c.values()),
+                # app_completed is a subset of completed, not another observation
+                "observations": sum(n for status, n in c.items() if status != "app_completed"),
                 "completion_share": c["completed"] / terminal
                 if terminal and not row["mandatory"]
                 else None,

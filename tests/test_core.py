@@ -168,7 +168,7 @@ def test_replay_applies_only_after_review_date():
 def test_base_dataset_every_employee_snapshot_builds():
     ds = load_base_dataset()
     assert len(ds.employees) == 200
-    for eid in list(ds.employees)[:40]:
+    for eid in ds.employees:
         snap = build_snapshot(ds, eid, overlay={})
         assert len(snap["recommendations"]) <= 3
         if not snap["recommendations"]:
