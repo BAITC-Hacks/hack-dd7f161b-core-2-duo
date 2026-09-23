@@ -9,7 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from fastapi import FastAPI, File, Header, HTTPException, UploadFile  # noqa: E402
 from pydantic import BaseModel, Field  # noqa: E402
 
-from career_quest.ai import select_actions  # noqa: E402
+from career_quest.ai import active_model, select_actions  # noqa: E402
 from career_quest.dataset import (  # noqa: E402
     Dataset,
     ValidationError,
@@ -151,7 +151,8 @@ async def employee_ai(
     ds = _dataset(req.overlay)
     _authorize(ds, employee_id, x_role, x_actor)
     snap = build_snapshot(ds, employee_id, req.overlay.model_dump())
-    cache_key = f"{snap['fingerprint']}:{req.locale}"
+    model = active_model()
+    cache_key = f"{snap['fingerprint']}:{req.locale}:{model}"
     if cache_key in _ai_cache:
         return {**_ai_cache[cache_key], "cached": True}
     result = await select_actions(snap, _skill_names(ds), req.locale)

@@ -78,8 +78,14 @@ def _d(value: str | None) -> date | None:
     return date.fromisoformat(value)
 
 
-def _int_or_none(value: str | None) -> int | None:
-    return None if value in (None, "") else int(value)
+def _int_or_none(value: Any) -> int | None:
+    if value in (None, ""):
+        return None
+    # csv values are strings; json also allows integers
+    # do not truncate floats or interpret booleans as ratings
+    if isinstance(value, bool) or not isinstance(value, (str, int)):
+        raise ValueError("Expected an integer")
+    return int(value)
 
 
 def parse_events(raw: list[dict]) -> dict[str, Event]:
@@ -165,6 +171,13 @@ def validate_scenario(
     required = ["employee_id", "role", "grade", "skills", "last_review_date"]
     for i, e in enumerate(employees):
         path = f"employees[{i}]"
+        try:
+            if _d(e.get("last_review_date")) is None:
+                raise ValueError("last_review_date is required")
+        except (ValueError, TypeError):
+            errors.append(
+                {"path": path, "code": "BAD_DATE", "detail": str(e.get("last_review_date"))}
+            )
         missing = [k for k in required if k not in e]
         if missing:
             errors.append({"path": path, "code": "MISSING_FIELDS", "detail": ", ".join(missing)})
@@ -194,10 +207,6 @@ def validate_scenario(
                         "detail": str(lvl),
                     }
                 )
-        try:
-            _d(e["last_review_date"])
-        except ValueError:
-            errors.append({"path": path, "code": "BAD_DATE", "detail": str(e["last_review_date"])})
         goal = e.get("career_goal")
         if goal is None:
             warnings.append({"path": path, "code": "CAREER_GOAL_EMPTY", "detail": eid})
@@ -237,10 +246,26 @@ def validate_scenario(
         record_ids.add(r.get("record_id"))
         try:
             d = _d(r.get("date"))
-            if r.get("status") == "completed" and d and d > base.as_of:
+            if d is None:
+                raise ValueError("date is required")
+            if r.get("status") == "completed" and d > base.as_of:
                 errors.append({"path": line, "code": "HISTORY_AFTER_SNAPSHOT", "detail": str(d)})
-        except ValueError:
+        except (ValueError, TypeError):
             errors.append({"path": line, "code": "BAD_DATE", "detail": str(r.get("date"))})
+        try:
+            _d(r.get("due_date"))
+        except (ValueError, TypeError):
+            errors.append({"path": line, "code": "BAD_DATE", "detail": str(r.get("due_date"))})
+        for field_name, minimum, maximum, code in (
+            ("score", 0, 100, "BAD_SCORE"),
+            ("feedback_rating", 1, 5, "BAD_FEEDBACK"),
+        ):
+            try:
+                value = _int_or_none(r.get(field_name))
+                if value is not None and not minimum <= value <= maximum:
+                    raise ValueError("Integer out of range")
+            except ValueError:
+                errors.append({"path": line, "code": code, "detail": str(r.get(field_name))})
         try:
             pct = int(r.get("completion_pct") or 0)
             if not 0 <= pct <= 100:
