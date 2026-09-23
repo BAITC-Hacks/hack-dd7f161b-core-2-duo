@@ -607,7 +607,7 @@ function Skills(ctx: Ctx) {
         <div className="row">
           <div className="legend">
             <span><i style={{ background: "var(--green)" }} />{t("assessed")}</span>
-            <span><i style={{ background: "repeating-linear-gradient(45deg, var(--green) 0 4px, #4fa887 4px 8px)" }} />{t("fromHistory")}</span>
+            <span><i style={{ background: "repeating-linear-gradient(45deg, var(--green) 0 4px, var(--green-stripe) 4px 8px)" }} />{t("fromHistory")}</span>
             <span><i style={{ background: "var(--amber-soft)", boxShadow: "inset 0 0 0 2px var(--amber)" }} />{t("gap")}</span>
           </div>
           <button className="btn small" aria-expanded={all} aria-controls={skillsId} onClick={() => setAll(!all)}>

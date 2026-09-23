@@ -6,6 +6,15 @@ import "./globals.css";
 const onest = Onest({ subsets: ["latin", "cyrillic", "cyrillic-ext"], variable: "--font-onest" });
 const unbounded = Unbounded({ subsets: ["latin", "cyrillic"], weight: ["400", "500", "600"], variable: "--font-unbounded" });
 
+const themeScript = `(() => {
+  let theme = "system";
+  try {
+    const saved = localStorage.getItem("career-quest:theme");
+    if (saved === "light" || saved === "dark") theme = saved;
+  } catch {}
+  document.documentElement.dataset.theme = theme;
+})();`;
+
 export const metadata: Metadata = {
   title: "Career Quest",
   description: "Объяснимый навигатор развития сотрудника",
@@ -13,7 +22,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ru" className={`${onest.variable} ${unbounded.variable}`}>
+    <html lang="ru" className={`${onest.variable} ${unbounded.variable}`} suppressHydrationWarning>
+      <head><script dangerouslySetInnerHTML={{ __html: themeScript }} /></head>
       <body><LocaleSync />{children}</body>
     </html>
   );
