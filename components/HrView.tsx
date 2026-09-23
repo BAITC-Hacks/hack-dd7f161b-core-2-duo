@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Fragment, useState } from "react";
 import { uploadFiles } from "@/lib/api";
 import { Meta, useApi } from "@/lib/hooks";
-import { INTERVENTION_TEXT, reasonText, translator } from "@/lib/i18n";
+import { INTERVENTION_TEXT, pick, reasonText, translator } from "@/lib/i18n";
 import { setState, useAppState } from "@/lib/store";
 
 const fmtPct = (v: number | null) => (v == null ? "—" : `${(v * 100).toFixed(0)}%`);
@@ -41,7 +41,6 @@ function SkillsSection({ data, meta }: { data: any; meta: Meta }) {
   const t = translator(s.locale);
   const [open, setOpen] = useState<string | null>(null);
   const [all, setAll] = useState(false);
-  const L = s.locale === "en" ? "en" : "ru";
   const rows = all ? data.skills : data.skills.slice(0, 15);
   return (
     <section className="panel">
@@ -101,7 +100,7 @@ function SkillsSection({ data, meta }: { data: any; meta: Meta }) {
                       <td colSpan={6} style={{ background: "var(--paper)" }}>
                         {k.intervention && (
                           <p>
-                            <b>{INTERVENTION_TEXT[k.intervention]?.[L]}</b>
+                            <b>{INTERVENTION_TEXT[k.intervention] ? pick(INTERVENTION_TEXT[k.intervention], s.locale) : k.intervention}</b>
                           </p>
                         )}
                         {k.blockers.map((b: any) => (
@@ -112,9 +111,14 @@ function SkillsSection({ data, meta }: { data: any; meta: Meta }) {
                         ))}
                         <p className="small muted">{k.top_groups.map((g: any) => `${g[0]}: ${g[1]}`).join(" · ")}</p>
                         <p className="small muted">
-                          {L === "en"
-                            ? "Draft for HR review. No capacity or budget data in the dataset, so no seat-shortage conclusions."
-                            : "Черновик для проверки HR. В датасете нет вместимости и бюджета — выводов о нехватке мест не делаем."}
+                          {pick(
+                            {
+                              ru: "Черновик для проверки HR. В датасете нет вместимости и бюджета — выводов о нехватке мест не делаем.",
+                              en: "Draft for HR review. No capacity or budget data in the dataset, so no seat-shortage conclusions.",
+                              kk: "HR тексеруіне арналған жоба. Деректерде сыйымдылық пен бюджет жоқ — орын тапшылығы туралы қорытынды жасамаймыз.",
+                            },
+                            s.locale,
+                          )}
                         </p>
                       </td>
                     </tr>
@@ -127,7 +131,9 @@ function SkillsSection({ data, meta }: { data: any; meta: Meta }) {
       </div>
       {data.skills.length > 15 && (
         <button className="btn small" style={{ marginTop: 12 }} onClick={() => setAll(!all)}>
-          {all ? (L === "en" ? "Show top 15" : "Показать первые 15") : L === "en" ? `Show all ${data.skills.length}` : `Показать все ${data.skills.length}`}
+          {all
+            ? pick({ ru: "Показать первые 15", en: "Show top 15", kk: "Алғашқы 15-ін көрсету" }, s.locale)
+            : `${pick({ ru: "Показать все", en: "Show all", kk: "Барлығын көрсету" }, s.locale)} ${data.skills.length}`}
         </button>
       )}
     </section>
