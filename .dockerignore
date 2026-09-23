@@ -1,0 +1,10 @@
+.git
+.venv
+.next
+node_modules
+tests
+project-tz
+.claude
+.env
+.env.*
+.vercel
