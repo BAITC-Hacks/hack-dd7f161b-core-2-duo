@@ -7,7 +7,7 @@ const onest = Onest({ subsets: ["latin", "cyrillic", "cyrillic-ext"], variable: 
 const unbounded = Unbounded({ subsets: ["latin", "cyrillic"], weight: ["400", "500", "600"], variable: "--font-unbounded" });
 
 const themeScript = `(() => {
-  let theme = "system";
+  let theme = "light";
   try {
     const saved = localStorage.getItem("career-quest:theme");
     if (saved === "light" || saved === "dark") theme = saved;
