@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Onest, Unbounded } from "next/font/google";
+import { LocaleSync } from "@/components/LocaleSync";
 import "./globals.css";
 
 const onest = Onest({ subsets: ["latin", "cyrillic", "cyrillic-ext"], variable: "--font-onest" });
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ru" className={`${onest.variable} ${unbounded.variable}`}>
-      <body>{children}</body>
+      <body><LocaleSync />{children}</body>
     </html>
   );
 }

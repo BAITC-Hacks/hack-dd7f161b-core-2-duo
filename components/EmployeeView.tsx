@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { ApiError, post } from "@/lib/api";
 import { Meta, useApi } from "@/lib/hooks";
 import { HEALTH_TEXT, pick, reasonText, renderFact, translator } from "@/lib/i18n";
@@ -34,7 +34,7 @@ const pct = (v: number | null | undefined) => (v == null ? "—" : v.toFixed(1))
 export function EmployeeView({ employeeId, meta, section }: { employeeId: string; meta: Meta; section: string }) {
   const s = useAppState();
   const t = translator(s.locale);
-  const { data: snap, error, loading } = useApi<Snapshot>(s, `/employees/${employeeId}`);
+  const { data: snap, error, loading, stale, retry } = useApi<Snapshot>(s, `/employees/${employeeId}`);
   const skill = (id: string) => meta.skills[id]?.name ?? id;
   const event = (id: string) => meta.events[id]?.title ?? id;
   const [toast, setToast] = useState<string | null>(null);
@@ -53,11 +53,12 @@ export function EmployeeView({ employeeId, meta, section }: { employeeId: string
   }, [snap?.fingerprint]);
 
   if (error instanceof ApiError && error.status === 403) return <p>{t("forbidden")}</p>;
-  if (!snap) return <p className="muted">{loading ? t("loading") : String(error)}</p>;
+  if (!snap) return error ? <RequestError message={t("snapshotError")} t={t} retry={retry} /> : <p className="muted">{t("loading")}</p>;
 
-  const ctx = { s, t, snap, meta, skill, event, employeeId };
+  const ctx = { s, t, snap, meta, skill, event, employeeId, refreshing: loading || stale };
   return (
-    <div className="stack">
+    <div className="stack" aria-busy={loading} data-stale={stale || undefined}>
+      {error ? <RequestError message={`${t("snapshotError")} ${t("snapshotStale")}`} t={t} retry={retry} /> : loading && <p role="status">{t("snapshotRefreshing")}</p>}
       {section === "path" && <PathSection {...ctx} />}
       {section === "activities" && <Catalog {...ctx} />}
       {section === "history" && <History {...ctx} />}
@@ -69,14 +70,22 @@ export function EmployeeView({ employeeId, meta, section }: { employeeId: string
   );
 }
 
-type Ctx = { s: AppState; t: ReturnType<typeof translator>; snap: Snapshot; meta: Meta; skill: (id: string) => string; event: (id: string) => string; employeeId: string };
+type Ctx = { s: AppState; t: ReturnType<typeof translator>; snap: Snapshot; meta: Meta; skill: (id: string) => string; event: (id: string) => string; employeeId: string; refreshing: boolean };
+
+function RequestError({ message, t, retry }: { message: string; t: Ctx["t"]; retry: () => void }) {
+  return <div className="panel" role="alert"><p>{message}</p><button className="btn small" style={{ marginTop: 8 }} onClick={retry}>{t("retry")}</button></div>;
+}
 
 function markDone(ctx: Ctx, c: { event_id: string; session: string | null }) {
+  if (ctx.refreshing) return;
   const gaming = !!currentOverlay(ctx.s).gaming[ctx.employeeId];
-  updateOverlay((o) => ({
-    ...o,
-    completions: [...o.completions, { employee_id: ctx.employeeId, event_id: c.event_id, session_date: c.session, gaming }],
-  }));
+  updateOverlay((o) => {
+    if (o.completions.some((done) => done.employee_id === ctx.employeeId && done.event_id === c.event_id && done.session_date === c.session)) return o;
+    return {
+      ...o,
+      completions: [...o.completions, { employee_id: ctx.employeeId, event_id: c.event_id, session_date: c.session, gaming }],
+    };
+  });
 }
 
 function toggleSnooze(ctx: Ctx, eventId: string) {
@@ -106,6 +115,9 @@ function Hero(ctx: Ctx) {
   const r = snap.readiness;
   const [editing, setEditing] = useState(false);
   const [goal, setGoal] = useState(`${snap.target.role}|${snap.target.grade}`);
+  useEffect(() => {
+    setGoal(`${snap.target.role}|${snap.target.grade}`);
+  }, [ctx.employeeId, snap.target.role, snap.target.grade]);
   return (
     <section className="hero">
       <div className="panel who">
@@ -143,12 +155,16 @@ function Hero(ctx: Ctx) {
         </p>
         {!editing ? (
           <div className="row" style={{ marginTop: 12 }}>
-            <button className="btn small" onClick={() => setEditing(true)}>
+            <button className="btn small" disabled={ctx.refreshing} onClick={() => {
+              setGoal(`${snap.target.role}|${snap.target.grade}`);
+              setEditing(true);
+            }}>
               {t("changeGoal")}
             </button>
             {snap.target.source === "user" && (
               <button
                 className="btn ghost small"
+                disabled={ctx.refreshing}
                 onClick={() =>
                   updateOverlay((o) => {
                     const g = { ...o.goals };
@@ -163,7 +179,7 @@ function Hero(ctx: Ctx) {
           </div>
         ) : (
           <div className="row" style={{ marginTop: 12 }}>
-            <select className="input" style={{ maxWidth: 320 }} value={goal} onChange={(ev) => setGoal(ev.target.value)}>
+            <select className="input" aria-label={t("target")} disabled={ctx.refreshing} style={{ maxWidth: 320 }} value={goal} onChange={(ev) => setGoal(ev.target.value)}>
               {meta.targets.map((x) => (
                 <option key={x} value={x}>
                   {x.replace("|", " — ")}
@@ -172,6 +188,7 @@ function Hero(ctx: Ctx) {
             </select>
             <button
               className="btn primary small"
+              disabled={ctx.refreshing}
               onClick={() => {
                 const [role, grade] = goal.split("|");
                 updateOverlay((o) => ({ ...o, goals: { ...o.goals, [ctx.employeeId]: { mode: "set", target_role: role, target_grade: grade } } }));
@@ -263,7 +280,7 @@ function NextStep(ctx: Ctx) {
             <span className="ai-status fallback">
               <span className="dot" />
               {t("aiFallback")}
-              {ai ? ` (${t(ai.ai_status)})` : ""}
+              {ai ? ` (${t("ai_" + ai.ai_status)})` : ""}
             </span>
           ))}
       </div>
@@ -356,7 +373,7 @@ function RecCard({ ctx, cand, choice, main }: { ctx: Ctx; cand: Cand; choice?: A
             </p>
             <div className="breakdown">
               {Object.entries(cand.breakdown).map(([k, v]) => (
-                <FragmentRow key={k} k={k} v={v} />
+                <FragmentRow key={k} label={t("score_" + k)} v={v} />
               ))}
             </div>
           </div>
@@ -364,10 +381,10 @@ function RecCard({ ctx, cand, choice, main }: { ctx: Ctx; cand: Cand; choice?: A
       )}
       {open === "whynot" && <WhyNot ctx={ctx} cand={cand} />}
       <div className="actions">
-        <button className="btn primary small" onClick={() => markDone(ctx, cand)}>
+        <button className="btn primary small" disabled={ctx.refreshing} onClick={() => markDone(ctx, cand)}>
           {t("markDone")}
         </button>
-        <button className="btn small" onClick={() => setSim(true)}>
+        <button className="btn small" disabled={ctx.refreshing} onClick={() => setSim(true)}>
           {t("whatIf")}
         </button>
         <button className="btn ghost small" aria-expanded={open === "why"} onClick={() => setOpen(open === "why" ? null : "why")}>
@@ -378,7 +395,7 @@ function RecCard({ ctx, cand, choice, main }: { ctx: Ctx; cand: Cand; choice?: A
             {t("whyNot")}
           </button>
         )}
-        <button className="btn ghost small" onClick={() => toggleSnooze(ctx, cand.event_id)}>
+        <button className="btn ghost small" disabled={ctx.refreshing} onClick={() => toggleSnooze(ctx, cand.event_id)}>
           {t("snooze")}
         </button>
       </div>
@@ -387,10 +404,10 @@ function RecCard({ ctx, cand, choice, main }: { ctx: Ctx; cand: Cand; choice?: A
   );
 }
 
-function FragmentRow({ k, v }: { k: string; v: number }) {
+function FragmentRow({ label, v }: { label: string; v: number }) {
   return (
     <>
-      <span>{k.replace(/_/g, " ")}</span>
+      <span>{label}</span>
       <b>{v > 0 ? `+${v}` : v}</b>
     </>
   );
@@ -506,7 +523,7 @@ function Route(ctx: Ctx) {
           </details>
           {remaining.length > 0 && <p className="small graph-note">{copy.remaining}: {remaining.map((n) => n.kind === "skill" ? `${n.label} ${n.planned}/${n.required}${n.critical ? " ★" : ""}` : "").join(" · ")}</p>}
           <div className="row">
-            <button className="btn small" onClick={() => setSim(true)}>
+            <button className="btn small" disabled={ctx.refreshing} onClick={() => setSim(true)}>
               {t("whatIf")}
             </button>
             <span className="small muted">{t("routeHint")}</span>
@@ -520,20 +537,55 @@ function Route(ctx: Ctx) {
 
 function Simulation({ ctx, steps, onClose }: { ctx: Ctx; steps: string[]; onClose: () => void }) {
   const { s, t, skill, event, employeeId } = ctx;
-  const { data } = useApi<any>(s, `/employees/${employeeId}/simulate`, { steps });
+  const { data, error, loading, retry } = useApi<any>(s, `/employees/${employeeId}/simulate`, { steps });
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+  const titleId = useId();
+  useEffect(() => {
+    const trigger = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    closeRef.current?.focus();
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        onCloseRef.current();
+      } else if (e.key === "Tab") {
+        const controls = Array.from(dialogRef.current?.querySelectorAll<HTMLElement>('button:not(:disabled), [href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex="0"]') ?? []);
+        const first = controls[0];
+        const last = controls[controls.length - 1];
+        if (!dialogRef.current?.contains(document.activeElement)) {
+          e.preventDefault();
+          (e.shiftKey ? last : first)?.focus();
+        } else if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last?.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first?.focus();
+        }
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      if (trigger?.isConnected) trigger.focus();
+    };
+  }, []);
   return (
     <div className="modal-back" onClick={onClose}>
-      <div className="modal" role="dialog" aria-modal onClick={(e) => e.stopPropagation()}>
+      <div className="modal" ref={dialogRef} role="dialog" aria-modal aria-labelledby={titleId} onClick={(e) => e.stopPropagation()}>
         <div className="section-head">
-          <h2>{t("whatIf")}</h2>
-          <button className="btn small" onClick={onClose}>
+          <h2 id={titleId}>{t("whatIf")}</h2>
+          <button className="btn small" ref={closeRef} onClick={onClose}>
             {t("close")}
           </button>
         </div>
         <p className="small muted">{t("simTitle")}</p>
-        {!data && <p>{t("loading")}</p>}
-        {data?.error && <p>{data.error.code}: {(data.error.reasons ?? []).map((r: any) => reasonText(r.code, s.locale)).join("; ")}</p>}
-        {data && !data.error && (
+        {loading && <p>{t("loading")}</p>}
+        {!!error && <RequestError message={t("simulationError")} t={t} retry={() => { closeRef.current?.focus(); retry(); }} />}
+        {!loading && !error && data?.error && <p>{data.error.code}: {(data.error.reasons ?? []).map((r: any) => reasonText(r.code, s.locale)).join("; ")}</p>}
+        {!loading && !error && data && !data.error && (
           <SimulationResult data={data} locale={s.locale} skillName={skill} eventName={event} />
         )}
       </div>
@@ -544,6 +596,7 @@ function Simulation({ ctx, steps, onClose }: { ctx: Ctx; steps: string[]; onClos
 function Skills(ctx: Ctx) {
   const { snap, t, skill } = ctx;
   const [all, setAll] = useState(false);
+  const skillsId = useId();
   const rows = (snap.skills as any[])
     .filter((r) => all || r.in_target)
     .sort((a, b) => Number(b.critical && b.gap > 0) - Number(a.critical && a.gap > 0) || b.gap - a.gap || (a.skill_id < b.skill_id ? -1 : 1));
@@ -557,12 +610,12 @@ function Skills(ctx: Ctx) {
             <span><i style={{ background: "repeating-linear-gradient(45deg, var(--green) 0 4px, #4fa887 4px 8px)" }} />{t("fromHistory")}</span>
             <span><i style={{ background: "var(--amber-soft)", boxShadow: "inset 0 0 0 2px var(--amber)" }} />{t("gap")}</span>
           </div>
-          <button className="btn small" onClick={() => setAll(!all)}>
+          <button className="btn small" aria-expanded={all} aria-controls={skillsId} onClick={() => setAll(!all)}>
             {all ? t("targetSkills") : t("allSkills")}
           </button>
         </div>
       </div>
-      <div className="skills">
+      <div className="skills" id={skillsId}>
         {rows.map((r) => (
           <SkillRow key={r.skill_id} r={r} name={skill(r.skill_id)} t={t} />
         ))}
@@ -573,6 +626,7 @@ function Skills(ctx: Ctx) {
 
 function SkillRow({ r, name, t }: { r: any; name: string; t: Ctx["t"] }) {
   const [open, setOpen] = useState(false);
+  const sourceId = useId();
   const cells = [1, 2, 3, 4, 5].map((lvl) => {
     if (lvl <= r.assessed) return "have";
     if (lvl <= r.current) return "gained";
@@ -593,13 +647,13 @@ function SkillRow({ r, name, t }: { r: any; name: string; t: Ctx["t"] }) {
       <div className="nums">
         {t("assessed")} {r.assessed} · {t("calculated")} <b>{r.current}</b> · {t("required")} {r.required ?? "—"}
         {r.applications.length > 0 && (
-          <button className="btn ghost small" onClick={() => setOpen(!open)} aria-expanded={open}>
+          <button className="btn ghost small" onClick={() => setOpen(!open)} aria-label={`${t("skillSource")}: ${name}`} aria-expanded={open} aria-controls={sourceId}>
             ⓘ
           </button>
         )}
       </div>
       {open && (
-        <div className="src">
+        <div className="src" id={sourceId}>
           {r.applications.map((a: any) => (
             <div key={a.record_id}>
               {a.record_id} / {a.event_id}, {a.date} ({a.date_confidence === "proxy" ? t("proxyDate") : t("appRecord")}): max(0, min({a.gain}, {a.cap}−{a.before}, 5−{a.before})) = +{a.actual} → {a.after}
