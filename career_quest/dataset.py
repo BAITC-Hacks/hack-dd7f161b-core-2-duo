@@ -182,10 +182,15 @@ def validate_scenario(
         if missing:
             errors.append({"path": path, "code": "MISSING_FIELDS", "detail": ", ".join(missing)})
             continue
-        eid = str(e["employee_id"])
-        if eid in ids:
+        eid = e["employee_id"]
+        if not isinstance(eid, str) or not eid.strip():
+            errors.append(
+                {"path": f"{path}.employee_id", "code": "BAD_EMPLOYEE_ID", "detail": str(eid)}
+            )
+        elif eid in ids:
             errors.append({"path": path, "code": "DUPLICATE_EMPLOYEE_ID", "detail": eid})
-        ids.add(eid)
+        else:
+            ids.add(eid)
         if (e["role"], e["grade"]) not in base.role_profiles:
             errors.append(
                 {
@@ -194,12 +199,18 @@ def validate_scenario(
                     "detail": f"{e['role']} / {e['grade']}",
                 }
             )
-        for sid, lvl in (e.get("skills") or {}).items():
+        skills = e["skills"]
+        if not isinstance(skills, dict):
+            errors.append(
+                {"path": f"{path}.skills", "code": "BAD_SKILLS", "detail": "Expected an object"}
+            )
+            skills = {}
+        for sid, lvl in skills.items():
             if sid not in base.skills:
                 errors.append(
                     {"path": f"{path}.skills.{sid}", "code": "UNKNOWN_SKILL", "detail": sid}
                 )
-            elif not isinstance(lvl, int) or not 0 <= lvl <= 5:
+            elif isinstance(lvl, bool) or not isinstance(lvl, int) or not 0 <= lvl <= 5:
                 errors.append(
                     {
                         "path": f"{path}.skills.{sid}",
@@ -210,11 +221,23 @@ def validate_scenario(
         goal = e.get("career_goal")
         if goal is None:
             warnings.append({"path": path, "code": "CAREER_GOAL_EMPTY", "detail": eid})
+        elif not isinstance(goal, dict):
+            errors.append(
+                {
+                    "path": f"{path}.career_goal",
+                    "code": "BAD_CAREER_GOAL",
+                    "detail": "Expected an object or null",
+                }
+            )
         elif (goal.get("target_role"), goal.get("target_grade")) not in base.role_profiles:
             errors.append(
                 {"path": f"{path}.career_goal", "code": "UNKNOWN_TARGET", "detail": str(goal)}
             )
-        if (
+        if e.get("manager_id") is not None and e["manager_id"] == eid:
+            errors.append(
+                {"path": f"{path}.manager_id", "code": "SELF_MANAGER", "detail": str(eid)}
+            )
+        elif (
             e.get("manager_id")
             and e["manager_id"] not in ids
             and e["manager_id"] not in {x.get("employee_id") for x in employees}
