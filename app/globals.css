@@ -81,47 +81,6 @@
   --focus: #a5b5ff;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    color-scheme: dark;
-    --paper: #101a15;
-    --surface: #19271f;
-    --ink: #edf6f0;
-    --ink-2: #c4d6cb;
-    --ink-3: #adc3b6;
-    --line: #41584a;
-    --line-subtle: #304439;
-    --green: #66d9ae;
-    --green-deep: #94ebc7;
-    --green-soft: #203e30;
-    --on-accent: #082f21;
-    --green-stripe: #33986e;
-    --green-bridge: #46b88b;
-    --amber: #f0c477;
-    --amber-soft: #44351c;
-    --red: #ffab9e;
-    --neutral-soft: #293d31;
-    --track: #344a3d;
-    --ruler-empty: #344a3d;
-    --forecast-stripe: #428a6d;
-    --shadow-soft: #00000066;
-    --shadow-panel: #00000080;
-    --backdrop: #000000a6;
-    --toast-bg: #dcefe6;
-    --toast-ink: #12241c;
-    --graph-bg: #142219;
-    --graph-dot: #365141;
-    --graph-edge: #99cdb5;
-    --graph-prerequisite: #edc47e;
-    --graph-requires: #b0c8df;
-    --graph-related: #8db29c;
-    --graph-available: #1d3527;
-    --graph-blocked: #352d1c;
-    --graph-completed: #26372d;
-    --focus: #a5b5ff;
-  }
-}
-
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
 body {

@@ -19,9 +19,4 @@ test("theme switch changes the page background and persists the choice", async (
   await expect(themeSwitch.getByRole("button", { name: "Тёмная", exact: true })).toHaveAttribute("aria-pressed", "true");
   await expect.poll(background).toBe(darkBackground);
 
-  await themeSwitch.getByRole("button", { name: "Системная", exact: true }).click();
-  await expect(page.locator("html")).toHaveAttribute("data-theme", "system");
-  await expect.poll(background).toBe(lightBackground);
-  await page.emulateMedia({ colorScheme: "dark" });
-  await expect.poll(background).toBe(darkBackground);
 });

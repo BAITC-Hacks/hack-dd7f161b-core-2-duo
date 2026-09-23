@@ -72,16 +72,16 @@ export function LangSwitch() {
   );
 }
 
-type Theme = "system" | "light" | "dark";
+type Theme = "light" | "dark";
 const THEME_KEY = "career-quest:theme";
-const themes: Theme[] = ["system", "light", "dark"];
+const themes: Theme[] = ["light", "dark"];
 const validTheme = (value: string | null | undefined): Theme =>
-  value === "light" || value === "dark" ? value : "system";
+  value === "dark" ? "dark" : "light";
 
 export function ThemeSwitch() {
   const { locale } = useAppState();
   const t = translator(locale);
-  const [theme, setTheme] = useState<Theme>("system");
+  const [theme, setTheme] = useState<Theme>("light");
 
   useEffect(() => {
     // The head script has already restored the theme before the first paint.

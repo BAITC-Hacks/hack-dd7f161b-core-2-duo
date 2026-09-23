@@ -182,11 +182,10 @@ API работает только через интерфейс `SessionStore` (
 **Вариант A - одной командой через Docker**
 
 ```bash
-git clone https://github.com/BAITC-Hacks/hack-dd7f161b-core-2-duo.git
-cd hack-dd7f161b-core-2-duo
-cp .env.example .env              # впишите OPENAI_API_KEY (без ключа AI честно переключится на правила)
 docker compose up --build
 ```
+
+Это единственная команда, которая нужна после клонирования репозитория. Файл `.env` необязателен: без него всё работает, а AI-блок честно показывает «рассчитано по правилам». Чтобы включить живой AI, до запуска выполните `cp .env.example .env` и впишите `OPENAI_API_KEY`.
 
 Откройте http://localhost:3000 (API - http://localhost:8000/api/py/docs).
 
@@ -226,7 +225,8 @@ npm run dev                       # FastAPI :8000 + Next.js :3000
 **Тесты:**
 
 ```bash
-npm run check    # ruff format/lint + pytest + сборка фронтенда с проверкой типов
+npm run verify   # всё сразу: ruff, pytest, сборка с проверкой типов и 20 E2E-тестов
+npm run check    # только ruff format/lint + pytest + сборка фронтенда с проверкой типов
 npx playwright install chromium   # один раз
 npm run e2e      # 11 браузерных E2E-тестов: сами поднимают API и фронтенд
 E2E_BASE_URL=https://career-quest-bay.vercel.app npm run e2e   # те же тесты против развёрнутой версии
