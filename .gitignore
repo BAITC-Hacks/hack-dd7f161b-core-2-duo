@@ -44,6 +44,8 @@ node_modules/
 .next/
 next-env.d.ts
 *.tsbuildinfo
+test-results/
+playwright-report/
 <<<<<<< HEAD
 .vercel
 =======

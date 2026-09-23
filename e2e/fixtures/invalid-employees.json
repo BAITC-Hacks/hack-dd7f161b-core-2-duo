@@ -1,0 +1,12 @@
+{
+  "meta": {
+    "dataset": "Career Quest",
+    "version": "1.0",
+    "as_of_date": "2026-10-01"
+  },
+  "employees": [
+    {
+      "employee_id": "INVALID_PROFILE"
+    }
+  ]
+}
