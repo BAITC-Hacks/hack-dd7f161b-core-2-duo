@@ -9,6 +9,8 @@ import { DevelopmentChat } from "@/components/DevelopmentChat";
 import { SimulationResult } from "@/components/SimulationResult";
 import { CareerGraph } from "@/components/CareerGraph";
 import { CareerGraphData, GRAPH_COPY } from "@/lib/career-graph";
+import { CompletionResult } from "@/components/CompletionResult";
+import { completionImpact, CompletionImpact } from "@/lib/completion-impact";
 
 type Fact = { id: string; category: string; code: string; values: Record<string, any> };
 type Cand = {
@@ -39,6 +41,35 @@ export function EmployeeView({ employeeId, meta, section }: { employeeId: string
   const event = (id: string) => meta.events[id]?.title ?? id;
   const [toast, setToast] = useState<string | null>(null);
   const prevReadiness = useRef<number | null>(null);
+  const stateKey = JSON.stringify([employeeId, s.session?.token, s.scenarioKey, s.scenario, currentOverlay(s)]);
+  const [pendingCompletion, setPendingCompletion] = useState<{ before: Snapshot; eventId: string; stateKey: string } | null>(null);
+  const [completed, setCompleted] = useState<{ impact: CompletionImpact; stateKey: string; fingerprint: string } | null>(null);
+  const completionInFlight = useRef(false);
+
+  useEffect(() => {
+    if (!pendingCompletion) return;
+    if (pendingCompletion.stateKey !== stateKey || (error && !loading)) {
+      setPendingCompletion(null);
+      completionInFlight.current = false;
+      return;
+    }
+    if (loading || !snap || snap.fingerprint === pendingCompletion.before.fingerprint) return;
+    const impact = completionImpact(pendingCompletion.before, snap, pendingCompletion.eventId);
+    setCompleted(impact ? { impact, stateKey, fingerprint: snap.fingerprint } : null);
+    setPendingCompletion(null);
+    completionInFlight.current = false;
+  }, [snap, loading, error, stateKey, pendingCompletion]);
+
+  function complete(c: { event_id: string; session: string | null }) {
+    if (completionInFlight.current || loading || stale || !snap) return;
+    const overlay = currentOverlay(s);
+    if (overlay.completions.some((done) => done.employee_id === employeeId && done.event_id === c.event_id && done.session_date === c.session)) return;
+    completionInFlight.current = true;
+    const next = { ...overlay, completions: [...overlay.completions, { employee_id: employeeId, event_id: c.event_id, session_date: c.session, gaming: !!overlay.gaming[employeeId] }] };
+    setCompleted(null);
+    setPendingCompletion({ before: snap, eventId: c.event_id, stateKey: JSON.stringify([employeeId, s.session?.token, s.scenarioKey, s.scenario, next]) });
+    updateOverlay(() => next);
+  }
 
   useEffect(() => {
     if (!snap) return;
@@ -55,7 +86,9 @@ export function EmployeeView({ employeeId, meta, section }: { employeeId: string
   if (error instanceof ApiError && error.status === 403) return <p>{t("forbidden")}</p>;
   if (!snap) return error ? <RequestError message={t("snapshotError")} t={t} retry={retry} /> : <p className="muted">{t("loading")}</p>;
 
-  const ctx = { s, t, snap, meta, skill, event, employeeId, refreshing: loading || stale };
+  const result = completed?.stateKey === stateKey && completed.fingerprint === snap.fingerprint ? completed.impact : null;
+  const ctx = { s, t, snap, meta, skill, event, employeeId, refreshing: loading || stale, complete, completing: loading || !!pendingCompletion,
+    completionResult: result ? <CompletionResult impact={result} title={event(result.eventId)} locale={s.locale} skillName={skill} onClose={() => setCompleted(null)} /> : null };
   return (
     <div className="stack" aria-busy={loading} data-stale={stale || undefined}>
       {error ? <RequestError message={`${t("snapshotError")} ${t("snapshotStale")}`} t={t} retry={retry} /> : loading && <p role="status">{t("snapshotRefreshing")}</p>}
@@ -70,22 +103,11 @@ export function EmployeeView({ employeeId, meta, section }: { employeeId: string
   );
 }
 
-type Ctx = { s: AppState; t: ReturnType<typeof translator>; snap: Snapshot; meta: Meta; skill: (id: string) => string; event: (id: string) => string; employeeId: string; refreshing: boolean };
+type Ctx = { s: AppState; t: ReturnType<typeof translator>; snap: Snapshot; meta: Meta; skill: (id: string) => string; event: (id: string) => string; employeeId: string; refreshing: boolean;
+  complete: (c: { event_id: string; session: string | null }) => void; completing: boolean; completionResult: React.ReactNode };
 
 function RequestError({ message, t, retry }: { message: string; t: Ctx["t"]; retry: () => void }) {
   return <div className="panel" role="alert"><p>{message}</p><button className="btn small" style={{ marginTop: 8 }} onClick={retry}>{t("retry")}</button></div>;
-}
-
-function markDone(ctx: Ctx, c: { event_id: string; session: string | null }) {
-  if (ctx.refreshing) return;
-  const gaming = !!currentOverlay(ctx.s).gaming[ctx.employeeId];
-  updateOverlay((o) => {
-    if (o.completions.some((done) => done.employee_id === ctx.employeeId && done.event_id === c.event_id && done.session_date === c.session)) return o;
-    return {
-      ...o,
-      completions: [...o.completions, { employee_id: ctx.employeeId, event_id: c.event_id, session_date: c.session, gaming }],
-    };
-  });
 }
 
 function toggleSnooze(ctx: Ctx, eventId: string) {
@@ -101,6 +123,7 @@ function PathSection(ctx: Ctx) {
   return (
     <>
       <Hero {...ctx} />
+      {ctx.completionResult}
       <NextStep {...ctx} />
       <Route {...ctx} />
       <Skills {...ctx} />
@@ -381,8 +404,8 @@ function RecCard({ ctx, cand, choice, main }: { ctx: Ctx; cand: Cand; choice?: A
       )}
       {open === "whynot" && <WhyNot ctx={ctx} cand={cand} />}
       <div className="actions">
-        <button className="btn primary small" disabled={ctx.refreshing} onClick={() => markDone(ctx, cand)}>
-          {t("markDone")}
+        <button className="btn primary small" disabled={ctx.refreshing || ctx.completing} onClick={() => ctx.complete(cand)}>
+          {ctx.completing ? t("loading") : t("markDone")}
         </button>
         <button className="btn small" disabled={ctx.refreshing} onClick={() => setSim(true)}>
           {t("whatIf")}
