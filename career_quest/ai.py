@@ -244,37 +244,23 @@ def validate_selection(raw: dict, candidates: list[dict]) -> tuple[list[dict], l
     return out, problems
 
 
-async def select_actions(snapshot: dict, skill_names: dict[str, str], locale: str) -> dict:
-    """Ask the LLM to pick 1-3 steps from the deterministic shortlist, then validate."""
+async def request_structured(
+    messages: list[dict], schema: dict, schema_name: str, prompt_version: str
+) -> dict:
+    """Shared OpenAI-compatible adapter; no tools, retries or model arithmetic."""
     t0 = time.perf_counter()
     model = active_model()
-    base = {"provider": "openai", "model": model, "prompt_version": PROMPT_VERSION}
-    candidates = snapshot.get("shortlist") or []
-    if not candidates:
-        return {**base, "ai_status": "not_needed", "choices": [], "elapsed_ms": 0}
+    base = {"provider": "openai", "model": model, "prompt_version": prompt_version}
     key = os.getenv("OPENAI_API_KEY")
     if not key:
-        return {**base, "ai_status": "fallback_disabled", "choices": [], "elapsed_ms": 0}
-    context = build_context(snapshot, candidates, skill_names)
-    event_ids = [c["event_id"] for c in candidates]
-    fact_ids = [f["id"] for c in context["candidates"] for f in c["facts"]]
+        return {**base, "ai_status": "fallback_disabled", "raw": None, "elapsed_ms": 0}
     body = {
         "model": model,
         **model_params(model),
-        "messages": [
-            {
-                "role": "system",
-                "content": SYSTEM_PROMPT.replace("{lang}", LANG_NAME.get(locale, "Russian")),
-            },
-            {"role": "user", "content": json.dumps(context, ensure_ascii=False)},
-        ],
+        "messages": messages,
         "response_format": {
             "type": "json_schema",
-            "json_schema": {
-                "name": "selection",
-                "strict": True,
-                "schema": _schema(event_ids, fact_ids),
-            },
+            "json_schema": {"name": schema_name, "strict": True, "schema": schema},
         },
     }
     try:
@@ -282,7 +268,7 @@ async def select_actions(snapshot: dict, skill_names: dict[str, str], locale: st
         async with asyncio.timeout(max(0.001, 8.8 - (time.perf_counter() - t0))):
             async with httpx.AsyncClient(timeout=httpx.Timeout(8.5, connect=3.0)) as client:
                 resp = await client.post(
-                    f"{os.getenv('OPENAI_BASE_URL', 'https://api.openai.com/v1')}/chat/completions",
+                    f"{os.getenv('OPENAI_BASE_URL', 'https://api.openai.com/v1').rstrip('/')}/chat/completions",
                     headers={"Authorization": f"Bearer {key}"},
                     json=body,
                 )
@@ -306,7 +292,7 @@ async def select_actions(snapshot: dict, skill_names: dict[str, str], locale: st
             return {
                 **base,
                 "ai_status": "fallback_invalid_output",
-                "choices": [],
+                "raw": None,
                 "validation": [invalid_reason],
                 "elapsed_ms": _ms(t0),
             }
@@ -315,30 +301,55 @@ async def select_actions(snapshot: dict, skill_names: dict[str, str], locale: st
             raise ValueError("invalid_response_content")
         raw = json.loads(content)
     except (TimeoutError, httpx.TimeoutException):
-        return {**base, "ai_status": "fallback_timeout", "choices": [], "elapsed_ms": _ms(t0)}
+        return {**base, "ai_status": "fallback_timeout", "raw": None, "elapsed_ms": _ms(t0)}
     except (httpx.HTTPError, KeyError, ValueError) as e:
         return {
             **base,
             "ai_status": "fallback_unavailable",
             "error": type(e).__name__,
-            "choices": [],
+            "raw": None,
             "elapsed_ms": _ms(t0),
         }
-    choices, problems = validate_selection(raw, candidates)
-    if not choices:
+    return {**base, "ai_status": "live_validated", "raw": raw, "elapsed_ms": _ms(t0)}
+
+
+async def select_actions(snapshot: dict, skill_names: dict[str, str], locale: str) -> dict:
+    """Ask the LLM to pick 1-3 steps from the deterministic shortlist, then validate."""
+    candidates = snapshot.get("shortlist") or []
+    if not candidates:
         return {
-            **base,
-            "ai_status": "fallback_invalid_output",
-            "validation": problems,
+            "provider": "openai",
+            "model": active_model(),
+            "prompt_version": PROMPT_VERSION,
+            "ai_status": "not_needed",
             "choices": [],
-            "elapsed_ms": _ms(t0),
+            "elapsed_ms": 0,
         }
+    context = build_context(snapshot, candidates, skill_names)
+    result = await request_structured(
+        [
+            {
+                "role": "system",
+                "content": SYSTEM_PROMPT.replace("{lang}", LANG_NAME.get(locale, "Russian")),
+            },
+            {"role": "user", "content": json.dumps(context, ensure_ascii=False)},
+        ],
+        _schema(
+            [c["event_id"] for c in candidates],
+            [f["id"] for c in context["candidates"] for f in c["facts"]],
+        ),
+        "selection",
+        PROMPT_VERSION,
+    )
+    raw = result.pop("raw")
+    if result["ai_status"] != "live_validated":
+        return {**result, "choices": []}
+    choices, problems = validate_selection(raw, candidates)
     return {
-        **base,
-        "ai_status": "live_validated",
-        "validation": problems,
+        **result,
+        "ai_status": "live_validated" if choices else "fallback_invalid_output",
         "choices": choices,
-        "elapsed_ms": _ms(t0),
+        "validation": problems,
     }
 
 

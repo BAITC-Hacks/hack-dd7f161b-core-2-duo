@@ -5,6 +5,8 @@ import { ApiError, post } from "@/lib/api";
 import { Meta, useApi } from "@/lib/hooks";
 import { HEALTH_TEXT, pick, reasonText, renderFact, translator } from "@/lib/i18n";
 import { AppState, currentOverlay, updateOverlay, useAppState } from "@/lib/store";
+import { DevelopmentChat } from "@/components/DevelopmentChat";
+import { SimulationResult } from "@/components/SimulationResult";
 import { CareerGraph } from "@/components/CareerGraph";
 import { CareerGraphData, GRAPH_COPY } from "@/lib/career-graph";
 
@@ -60,6 +62,8 @@ export function EmployeeView({ employeeId, meta, section }: { employeeId: string
       {section === "activities" && <Catalog {...ctx} />}
       {section === "history" && <History {...ctx} />}
       {section === "settings" && <Settings {...ctx} />}
+      <DevelopmentChat key={`${employeeId}:${s.session?.token}:${s.scenarioKey}:${s.locale}`} s={s} employeeId={employeeId} meta={meta}
+        fingerprint={snap.fingerprint} suggestedTitle={snap.recommendations[0]?.title} />
       {toast && <div className="toast" role="status">{toast}</div>}
     </div>
   );
@@ -530,36 +534,7 @@ function Simulation({ ctx, steps, onClose }: { ctx: Ctx; steps: string[]; onClos
         {!data && <p>{t("loading")}</p>}
         {data?.error && <p>{data.error.code}: {(data.error.reasons ?? []).map((r: any) => reasonText(r.code, s.locale)).join("; ")}</p>}
         {data && !data.error && (
-          <div className="stack" style={{ marginTop: 14, gap: 14 }}>
-            <div className="readiness">
-              <div className="num" style={{ fontSize: 40 }}>
-                {pct(data.before.readiness_pct)}→{pct(data.after.readiness_pct)}
-                <small>%</small>
-              </div>
-            </div>
-            <div className="bar">
-              <span className="ghost" style={{ width: `${data.after.readiness_pct}%` }} />
-              <span style={{ width: `${data.before.readiness_pct}%`, position: "relative" }} />
-            </div>
-            <ol className="route">
-              {data.steps.map((st: any, i: number) => (
-                <li key={st.event_id}>
-                  <span className="node">{i + 1}</span>
-                  <div className="step-title">{st.title}</div>
-                  <div className="changes">
-                    {st.changes.filter((c: any) => c.actual > 0).map((c: any) => `${skill(c.skill_id)} ${c.before}→${c.after}`).join(", ") || "—"} · {t("readinessDelta")} +
-                    {st.readiness_delta_pp.toFixed(1)} {pick({ ru: "п.п.", en: "pp", kk: "п.т." }, s.locale)}
-                    {st.new_unlocks.length > 0 && ` · ${t("unlocks")}: ${st.new_unlocks.map(event).join(", ")}`}
-                  </div>
-                </li>
-              ))}
-            </ol>
-            {data.after.remaining_gaps.length > 0 && (
-              <p className="small">
-                {t("gap")}: {data.after.remaining_gaps.map((g: any) => `${skill(g.skill_id)} ${g.current}/${g.required}${g.critical ? "*" : ""}`).join(", ")}
-              </p>
-            )}
-          </div>
+          <SimulationResult data={data} locale={s.locale} skillName={skill} eventName={event} />
         )}
       </div>
     </div>

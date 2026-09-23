@@ -37,11 +37,12 @@ async function response<T>(res: Response, s: AppState, requireSession: boolean):
   return res.json();
 }
 
-export async function post<T>(s: AppState, path: string, extra: Record<string, unknown> = {}): Promise<T> {
+export async function post<T>(s: AppState, path: string, extra: Record<string, unknown> = {}, signal?: AbortSignal): Promise<T> {
   const res = await fetch(`/api/py${path}`, {
     method: "POST",
     headers: headers(s),
     body: JSON.stringify({ overlay: requestOverlay(s), locale: s.locale, ...extra }),
+    signal,
   });
   return response<T>(res, s, !["/auth/login", "/meta", "/health"].includes(path));
 }
