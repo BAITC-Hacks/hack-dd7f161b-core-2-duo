@@ -31,7 +31,7 @@ CI: `.github/workflows/ci.yml` runs the same steps. It's triggered manually (`wo
 ### Vercel deployment
 
 One project: Next.js (frontend) + `api/index.py` (FastAPI as a Python Serverless Function, see `vercel.json`).
-Environment variables in the Vercel project: `OPENAI_API_KEY` (required for the AI layer) and `OPENAI_MODEL` (default `gpt-4.1-mini`).
+Environment variables in the Vercel project: `OPENAI_API_KEY` (required for the AI layer) and `OPENAI_MODEL` (default `gpt-4.1`). Measured on production: gpt-4.1 answers in 1.7–4.3 s, while gpt-5 with `reasoning_effort=low` does not fit the 9 s budget. Reasoning models are supported (`OPENAI_REASONING_EFFORT`).
 
 ```bash
 npx vercel login && npx vercel --prod
