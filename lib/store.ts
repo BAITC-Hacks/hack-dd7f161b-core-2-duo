@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 
 export type Locale = "ru" | "kk" | "en";
 export type Session = { role: "employee" | "hr"; actor?: string } | null;
@@ -79,4 +79,11 @@ export function updateOverlay(fn: (o: Overlay) => Overlay) {
 
 export function requestOverlay(s: AppState) {
   return { ...currentOverlay(s), scenario: s.scenarioKey === "check" ? s.scenario : null };
+}
+
+// false during ssr/hydration, when useAppState still returns the empty server snapshot
+export function useHydrated(): boolean {
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => setHydrated(true), []);
+  return hydrated;
 }
