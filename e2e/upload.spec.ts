@@ -67,7 +67,7 @@ test('HR creates a three-person scenario and rejects an invalid upload', async (
     expect.objectContaining({ path: 'employees[0]', code: 'MISSING_FIELDS' }),
   ]));
   await expect(page.getByRole('heading', { name: 'Ошибки', exact: true })).toBeVisible();
-  await expect(page.getByText(/employees\[0\] — MISSING_FIELDS/)).toBeVisible();
+  await expect(page.getByText(/employees\[0\]: MISSING_FIELDS/)).toBeVisible();
   await expect(createScenario).toHaveCount(0);
   await expect(scenarioChip).toBeVisible();
   await page.getByRole('button', { name: 'Навыки и ограничения', exact: true }).click();

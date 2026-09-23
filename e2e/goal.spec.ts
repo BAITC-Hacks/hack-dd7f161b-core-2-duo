@@ -8,7 +8,7 @@ test('другая цель меняет источник, сброс восст
   const target = profile.locator('.goal-line .to');
   const source = profile.locator(':scope > p');
   await expect(target).not.toBeEmpty();
-  await expect(source).toHaveText('Цель не выбрана — рассчитан следующий грейд');
+  await expect(source).toHaveText('Цель не выбрана: рассчитан следующий грейд');
   const originalTarget = await target.innerText();
   const originalSource = await source.innerText();
 

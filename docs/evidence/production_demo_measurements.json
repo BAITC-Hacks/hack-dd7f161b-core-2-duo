@@ -25376,7 +25376,7 @@
               "TARGET_CRITICAL_GAP",
               "HISTORY_FAVORABLE"
             ],
-            "explanation": "Сейчас вы — Customer Support Specialist уровня Middle; для предварительного ориентира следующего уровня Senior требуется Technical Troubleshooting на уровне 3, а ваш уровень — 2. Академия полностью закроет этот разрыв, повысив навык с 2 до 3, и улучшит Product Knowledge с 2 до 3, но разрыв по нему останется. В онлайн-формате ранее были завершены 3 активности, 1 была прекращена, пропусков не было."
+            "explanation": "Сейчас вы - Customer Support Specialist уровня Middle; для предварительного ориентира следующего уровня Senior требуется Technical Troubleshooting на уровне 3, а ваш уровень - 2. Академия полностью закроет этот разрыв, повысив навык с 2 до 3, и улучшит Product Knowledge с 2 до 3, но разрыв по нему останется. В онлайн-формате ранее были завершены 3 активности, 1 была прекращена, пропусков не было."
           },
           {
             "event_id": "EV_039",
@@ -25393,7 +25393,7 @@
               "TARGET_GAP",
               "HISTORY_FAVORABLE"
             ],
-            "explanation": "Сейчас вы — Customer Support Specialist уровня Middle; для предварительного ориентира следующего уровня Senior требуется Adaptability на уровне 3, а ваш уровень — 2. Активность полностью закроет разрыв по Adaptability, повысив навык с 2 до 3; при этом разрыв по критическому Technical Troubleshooting останется. В онлайн-формате ранее были завершены 3 активности, 1 была прекращена, пропусков не было."
+            "explanation": "Сейчас вы - Customer Support Specialist уровня Middle; для предварительного ориентира следующего уровня Senior требуется Adaptability на уровне 3, а ваш уровень - 2. Активность полностью закроет разрыв по Adaptability, повысив навык с 2 до 3; при этом разрыв по критическому Technical Troubleshooting останется. В онлайн-формате ранее были завершены 3 активности, 1 была прекращена, пропусков не было."
           },
           {
             "event_id": "EV_040",
@@ -25410,7 +25410,7 @@
               "TARGET_GAP",
               "HISTORY_INSUFFICIENT"
             ],
-            "explanation": "Сейчас вы — Customer Support Specialist уровня Middle; для предварительного ориентира следующего уровня Senior требуется Problem Solving на уровне 3, а ваш уровень — 2. Активность полностью закроет разрыв по Problem Solving, повысив навык с 2 до 3; при этом разрыв по критическому Technical Troubleshooting останется. Надёжных данных о ваших предпочтениях по прошлому участию нет."
+            "explanation": "Сейчас вы - Customer Support Specialist уровня Middle; для предварительного ориентира следующего уровня Senior требуется Problem Solving на уровне 3, а ваш уровень - 2. Активность полностью закроет разрыв по Problem Solving, повысив навык с 2 до 3; при этом разрыв по критическому Technical Troubleshooting останется. Надёжных данных о ваших предпочтениях по прошлому участию нет."
           }
         ],
         "elapsed_ms": 5064,
@@ -25441,7 +25441,7 @@
             "reason_codes": [
               "HISTORY_INSUFFICIENT"
             ],
-            "explanation": "Вы — Product Manager уровня Junior, а профильная цель уровня Middle требует развития Product Discovery, где сохраняется пробел. Applied Statistics for Analysts улучшит Statistics на 1 уровень, но данных об изменении пробела нет; Product Discovery и Product Analytics останутся критическими пробелами. Надёжных данных о ваших предпочтениях в активностях нет."
+            "explanation": "Вы - Product Manager уровня Junior, а профильная цель уровня Middle требует развития Product Discovery, где сохраняется пробел. Applied Statistics for Analysts улучшит Statistics на 1 уровень, но данных об изменении пробела нет; Product Discovery и Product Analytics останутся критическими пробелами. Надёжных данных о ваших предпочтениях в активностях нет."
           }
         ],
         "elapsed_ms": 2352,
@@ -25490,7 +25490,7 @@
               "TARGET_CRITICAL_GAP",
               "HISTORY_INSUFFICIENT"
             ],
-            "explanation": "Вы — аналитик данных уровня Middle; для целевой роли Product Manager уровня Middle вам не хватает одного уровня Product Analytics до требования 3. Мастерская повысит Product Analytics с 2 до 3 и закроет этот разрыв, но критический пробел в Product Discovery останется. Надёжных данных о ваших предпочтениях по занятиям нет."
+            "explanation": "Вы - аналитик данных уровня Middle; для целевой роли Product Manager уровня Middle вам не хватает одного уровня Product Analytics до требования 3. Мастерская повысит Product Analytics с 2 до 3 и закроет этот разрыв, но критический пробел в Product Discovery останется. Надёжных данных о ваших предпочтениях по занятиям нет."
           }
         ],
         "elapsed_ms": 2778,
@@ -31600,7 +31600,7 @@
             "TARGET_CRITICAL_GAP",
             "HISTORY_FAVORABLE"
           ],
-          "explanation": "Сейчас вы — Customer Support Specialist уровня Middle; для предварительного ориентира следующего уровня Senior требуется Technical Troubleshooting на уровне 3, а ваш уровень — 2. Академия полностью закроет этот разрыв, повысив навык с 2 до 3, и улучшит Product Knowledge с 2 до 3, но разрыв по нему останется. В онлайн-формате ранее были завершены 3 активности, 1 была прекращена, пропусков не было."
+          "explanation": "Сейчас вы - Customer Support Specialist уровня Middle; для предварительного ориентира следующего уровня Senior требуется Technical Troubleshooting на уровне 3, а ваш уровень - 2. Академия полностью закроет этот разрыв, повысив навык с 2 до 3, и улучшит Product Knowledge с 2 до 3, но разрыв по нему останется. В онлайн-формате ранее были завершены 3 активности, 1 была прекращена, пропусков не было."
         },
         {
           "event_id": "EV_039",
@@ -31617,7 +31617,7 @@
             "TARGET_GAP",
             "HISTORY_FAVORABLE"
           ],
-          "explanation": "Сейчас вы — Customer Support Specialist уровня Middle; для предварительного ориентира следующего уровня Senior требуется Adaptability на уровне 3, а ваш уровень — 2. Активность полностью закроет разрыв по Adaptability, повысив навык с 2 до 3; при этом разрыв по критическому Technical Troubleshooting останется. В онлайн-формате ранее были завершены 3 активности, 1 была прекращена, пропусков не было."
+          "explanation": "Сейчас вы - Customer Support Specialist уровня Middle; для предварительного ориентира следующего уровня Senior требуется Adaptability на уровне 3, а ваш уровень - 2. Активность полностью закроет разрыв по Adaptability, повысив навык с 2 до 3; при этом разрыв по критическому Technical Troubleshooting останется. В онлайн-формате ранее были завершены 3 активности, 1 была прекращена, пропусков не было."
         },
         {
           "event_id": "EV_040",
@@ -31634,7 +31634,7 @@
             "TARGET_GAP",
             "HISTORY_INSUFFICIENT"
           ],
-          "explanation": "Сейчас вы — Customer Support Specialist уровня Middle; для предварительного ориентира следующего уровня Senior требуется Problem Solving на уровне 3, а ваш уровень — 2. Активность полностью закроет разрыв по Problem Solving, повысив навык с 2 до 3; при этом разрыв по критическому Technical Troubleshooting останется. Надёжных данных о ваших предпочтениях по прошлому участию нет."
+          "explanation": "Сейчас вы - Customer Support Specialist уровня Middle; для предварительного ориентира следующего уровня Senior требуется Problem Solving на уровне 3, а ваш уровень - 2. Активность полностью закроет разрыв по Problem Solving, повысив навык с 2 до 3; при этом разрыв по критическому Technical Troubleshooting останется. Надёжных данных о ваших предпочтениях по прошлому участию нет."
         }
       ],
       "elapsed_ms": 5064,

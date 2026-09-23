@@ -42,7 +42,7 @@ def main():
             name: hashlib.sha256((EVIDENCE / name).read_bytes()).hexdigest()
             for name in names + ["local_measurements.json", "evaluation_branch.json"]
         },
-        "scope_ru": "Производные значения из сохранённых реальных запусков. repeat_ai исключён. Кэш и not_needed исключены из свежих AI-вызовов. HTTP включает сеть, внутренний elapsed_ms — отдельный показатель.",
+        "scope_ru": "Производные значения из сохранённых реальных запусков. repeat_ai исключён. Кэш и not_needed исключены из свежих AI-вызовов. HTTP включает сеть, внутренний elapsed_ms - отдельный показатель.",
         "started_utc": min(run["started_utc"] for run in runs),
         "finished_utc": max(run["finished_utc"] for run in runs),
         "profiles": len(profiles),
