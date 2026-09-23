@@ -195,7 +195,7 @@ def validate_selection(raw: dict, candidates: list[dict]) -> tuple[list[dict], l
 async def select_actions(snapshot: dict, skill_names: dict[str, str], locale: str) -> dict:
     """Ask the LLM to pick 1-3 steps from the deterministic shortlist, then validate."""
     t0 = time.perf_counter()
-    model = os.getenv("OPENAI_MODEL", "gpt-4.1-mini")
+    model = os.getenv("OPENAI_MODEL", "gpt-4.1")
     base = {"provider": "openai", "model": model, "prompt_version": PROMPT_VERSION}
     candidates = snapshot.get("shortlist") or []
     if not candidates:
