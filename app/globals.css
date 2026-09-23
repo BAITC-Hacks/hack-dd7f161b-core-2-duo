@@ -294,3 +294,6 @@ select.input { appearance: auto; }
   .graph-detail-columns { grid-template-columns: 1fr; gap: 0; }
   .graph-table-wrap td, .graph-table-wrap th { padding: 8px 4px; }
 }
+
+/* long uploaded file names must not widen the page on phones */
+.scenario-chip { white-space: normal; max-width: 100%; overflow-wrap: anywhere; }

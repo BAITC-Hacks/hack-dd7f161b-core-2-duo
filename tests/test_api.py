@@ -116,3 +116,17 @@ def test_ai_cache_reuses_result_for_same_model(client, monkeypatch, configured_m
     assert first.status_code == second.status_code == 200
     assert calls == [configured_model or DEFAULT_MODEL]
     assert second.json() == {**first.json(), "cached": True}
+
+
+@pytest.mark.parametrize(
+    "payload", ['{"employees": null}', '{"employees": [null]}', '{"employees": "bad"}', "[1, 2]"]
+)
+def test_malformed_employees_json_returns_report_not_500(client, payload):
+    response = client.post(
+        "/api/py/hr/import/validate",
+        headers=_token(client, "hr", "hr-demo"),
+        files={"files": ("employees.json", payload, "application/json")},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["ok"] is False
