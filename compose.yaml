@@ -5,6 +5,10 @@ services:
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       OPENAI_MODEL: ${OPENAI_MODEL:-gpt-6-luna}
       OPENAI_REASONING_EFFORT: ${OPENAI_REASONING_EFFORT:-none}
+      # local demo default; set a random value in .env for anything shared
+      AUTH_SECRET: ${AUTH_SECRET:-}
+      DEMO_EMPLOYEE_PASSWORD: ${DEMO_EMPLOYEE_PASSWORD:-demo}
+      DEMO_HR_PASSWORD: ${DEMO_HR_PASSWORD:-hr-demo}
     ports: ["8000:8000"]
   web:
     build: { context: ., target: web }
